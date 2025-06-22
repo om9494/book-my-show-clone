@@ -46,7 +46,7 @@ public class Movie {
 	    private Language language;
 
 	    private String imageUrl; // 🎞️ NEW FIELD for poster/banner image
-		
+
 		
 }
 

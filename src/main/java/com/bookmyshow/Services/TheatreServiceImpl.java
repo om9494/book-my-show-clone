@@ -1,10 +1,12 @@
-package com.example.Super30_Project.Services;
+package com.bookmyshow.Services;
 
-import com.example.Super30_Project.Dtos.TheatreDto;
-import com.example.Super30_Project.Repository.TheatreRepository;
-import com.example.Super30_Project.Entity.Theatre;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.bookmyshow.Dtos.RequestDtos.TheatreDto;
+import com.bookmyshow.Models.Theatre;
+import com.bookmyshow.Repositories.TheatreRepository;
 
 import java.util.List;
 

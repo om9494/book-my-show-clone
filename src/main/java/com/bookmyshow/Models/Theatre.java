@@ -1,50 +1,45 @@
-package com.example.Super30_Project.Entity;
+package com.bookmyshow.Models;
 
+import java.util.ArrayList;
+import java.util.List;
+
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "theaters")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Theatre {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private String name;
+    
+    @Column(unique = true)
+    private String address;
+    
     private String city;
     private int numberOfScreens;
+    
+    @OneToMany(mappedBy = "theater", cascade = CascadeType.ALL)
+    private List<TheaterSeat> theaterSeatList = new ArrayList<>();
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public int getNumberOfScreens() {
-        return numberOfScreens;
-    }
-
-    public void setNumberOfScreens(int numberOfScreens) {
-        this.numberOfScreens = numberOfScreens;
-    }
+    @OneToMany(mappedBy = "theater", cascade = CascadeType.ALL)
+    private List<Show> showList = new ArrayList<>();
 }
 

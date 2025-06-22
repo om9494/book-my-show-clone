@@ -1,4 +1,4 @@
-package com.example.Super30_Project.Dtos;
+package com.bookmyshow.Dtos.RequestDtos;
 
 public class TheatreDto {
     private String name;

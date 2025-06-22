@@ -1,6 +1,6 @@
-package com.example.Super30_Project.Repository;
+package com.bookmyshow.Repositories;
 
-import com.example.Super30_Project.Entity.Theatre;
+import com.bookmyshow.Models.Theatre;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

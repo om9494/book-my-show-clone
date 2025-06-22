@@ -1,9 +1,11 @@
-package com.example.Super30_Project.Services;
+package com.bookmyshow.Services;
 
-import com.example.Super30_Project.Dtos.TheatreDto;
-import com.example.Super30_Project.Entity.Theatre;
 
 import java.util.List;
+
+
+import com.bookmyshow.Dtos.RequestDtos.TheatreDto;
+import com.bookmyshow.Models.Theatre;
 
 public interface TheatreService {
     String addTheatre(TheatreDto theatreDto);
