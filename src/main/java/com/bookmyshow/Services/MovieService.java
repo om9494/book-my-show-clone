@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.bookmyshow.Dtos.RequestDtos.MovieEntryDto;
 import com.bookmyshow.Exceptions.MovieAlreadyPresentWithSameNameAndLanguage;
+import com.bookmyshow.Exceptions.MovieDoesNotExists;
 import com.bookmyshow.Models.Movie;
 import com.bookmyshow.Repositories.MovieRepository;
 import com.bookmyshow.Transformers.MovieTransformer;
@@ -26,4 +27,11 @@ public class MovieService {
         movieRepository.save(movie);
         return "The movie has been added successfully";
     }
+    
+    public Movie getMovieByName(String name) {
+        Movie movie = movieRepository.findByMovieName(name);
+        if (movie == null) throw new MovieDoesNotExists();
+        return movie;
+    }
+
 }
