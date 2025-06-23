@@ -21,6 +21,12 @@
     </properties>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
         <!-- Spring Boot Starter Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -54,11 +60,11 @@
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
         </dependency>
-        <dependency>
+        <!-- <dependency>
         	<groupId>com.SpringRestAPII</groupId>
         	<artifactId>SpringRestApii</artifactId>
         	<version>0.0.1-SNAPSHOT</version>
-        </dependency>
+        </dependency> -->
         <dependency>
     <groupId>jakarta.validation</groupId>
     <artifactId>jakarta.validation-api</artifactId>
