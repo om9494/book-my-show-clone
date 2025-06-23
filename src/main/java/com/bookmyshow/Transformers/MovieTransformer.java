@@ -1,6 +1,7 @@
 package com.bookmyshow.Transformers;
 
 import com.bookmyshow.Dtos.RequestDtos.MovieEntryDto;
+
 import com.bookmyshow.Models.Movie;
 
 public class MovieTransformer {
