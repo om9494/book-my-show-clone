@@ -17,6 +17,9 @@ import java.sql.Time;
 import java.util.List;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/shows")
@@ -68,6 +71,26 @@ public class ShowController {
             return e.getMessage();
         }
     }
+
+    @GetMapping("/movie/{movieId}/theater/{theaterId}")
+    public List<Show> getShowByMovieAndTheater(@PathVariable Integer movieId, @PathVariable Integer theaterId) {
+        try {
+            return showService.getShowByMovieAndTheater(movieId, theaterId);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    
+
+    @GetMapping("/movie/{movieId}")
+    public List<Show> getAllShowByMovie(@PathVariable Integer movieId) {
+        try {
+            return showService.getAllShowByMovie(movieId);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    
 
     @PostMapping("/associateShowSeats")
     public String associateShowSeats(@RequestBody ShowSeatEntryDto showSeatEntryDto) {

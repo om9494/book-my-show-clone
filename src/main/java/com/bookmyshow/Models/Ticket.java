@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,21 +24,24 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Ticket {
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer ticketId;
-    private Integer totalTicketsPrice;
-    private String bookedSeats;
-    
+    private Integer ticketPrice; // includes - Seat Price + Food Price + Other
+
     @CreationTimestamp
     private Date bookedAt;
-    
+
     @ManyToOne
     @JoinColumn
-    private Show show;
-    
+    private Show show; // Booked Show in the theater
+
     @ManyToOne
     @JoinColumn
-    private User user;
-    
+    private User user; // Booked User
+
+    @OneToOne
+    @JoinColumn
+    private ShowSeat showSeat; // Booked Seat
+
 }

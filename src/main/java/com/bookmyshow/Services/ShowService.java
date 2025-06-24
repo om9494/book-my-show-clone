@@ -17,6 +17,10 @@ public interface ShowService {
 	public String addShow(ShowEntryDto showEntryDto) throws MovieDoesNotExists, TheaterDoesNotExists;
 	public String updateShow(int id, ShowEntryDto showEntryDto) throws ShowDoesNotExists, MovieDoesNotExists, TheaterDoesNotExists;
 	public String deleteShow(int id) throws ShowDoesNotExists;
+
+	public List<Show> getShowByMovieAndTheater(int movieId, int theaterId)
+			throws MovieDoesNotExists, TheaterDoesNotExists;
+	public List<Show> getAllShowByMovie(int movieId);
 	public String associateShowSeats(ShowSeatEntryDto showSeatEntryDto) throws ShowDoesNotExists;
 	public List<Time> showTimingsOnDate(ShowTimingsDto showTimingsDto);
 	public String movieHavingMostShows();
