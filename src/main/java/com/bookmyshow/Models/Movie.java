@@ -11,6 +11,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Column;
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.Enumerated;
 import com.bookmyshow.Enums.Genre;
 import com.bookmyshow.Enums.Language;
@@ -46,8 +49,7 @@ public class Movie {
 	    @Enumerated(EnumType.STRING)
 	    private Language language;
 
-	    private String imageUrl; // 🎞️ NEW FIELD for poster/banner image
-		
+		private String imageUrl; // 🎞️ NEW FIELD for poster/banner image
 		
 }
 

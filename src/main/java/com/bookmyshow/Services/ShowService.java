@@ -9,8 +9,11 @@ import com.bookmyshow.Dtos.RequestDtos.ShowTimingsDto;
 import com.bookmyshow.Exceptions.MovieDoesNotExists;
 import com.bookmyshow.Exceptions.ShowDoesNotExists;
 import com.bookmyshow.Exceptions.TheaterDoesNotExists;
+import com.bookmyshow.Models.Show;
 
 public interface ShowService {
+	public List<Show> getAllShows();
+	public Show getShowById(int id) throws ShowDoesNotExists;
 	public String addShow(ShowEntryDto showEntryDto) throws MovieDoesNotExists, TheaterDoesNotExists;
 	public String updateShow(int id, ShowEntryDto showEntryDto) throws ShowDoesNotExists, MovieDoesNotExists, TheaterDoesNotExists;
 	public String deleteShow(int id) throws ShowDoesNotExists;
