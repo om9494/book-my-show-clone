@@ -29,4 +29,40 @@ public class MovieController {
         return new ResponseEntity<>(movie, HttpStatus.OK);
     }
 
+    @GetMapping("/totalCollection/{movieId}")
+    public ResponseEntity<Long> totalCollection(@PathVariable Integer movieId) {
+        try {
+            Long result = movieService.totalCollection(movieId);
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
+    
+    @GetMapping("/all")
+    public ResponseEntity<List<Movie>> getAllMovies() {
+        List<Movie> movieList = movieService.getAllMovies();
+        return new ResponseEntity<>(movieList, HttpStatus.OK);
+    }
+    
+    @GetMapping("/id/{id}") // ✅ GET by ID
+    public ResponseEntity<Movie> getMovieById(@PathVariable Integer id) {
+        Movie movie = movieService.getMovieById(id);
+        return new ResponseEntity<>(movie, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}") // ✅ DELETE
+    public ResponseEntity<String> deleteMovie(@PathVariable Integer id) {
+        movieService.deleteMovie(id);
+        return new ResponseEntity<>("Movie deleted successfully", HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}") // ✅ PUT/Update
+    public ResponseEntity<String> updateMovie(@PathVariable Integer id,
+                                              @RequestBody @Valid MovieEntryDto movieEntryDto) {
+        movieService.updateMovie(id, movieEntryDto);
+        return new ResponseEntity<>("Movie updated successfully", HttpStatus.OK);
+    }
+
+
 }
