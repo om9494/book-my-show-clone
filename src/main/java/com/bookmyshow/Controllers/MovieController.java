@@ -5,6 +5,9 @@ import com.bookmyshow.Dtos.RequestDtos.MovieEntryDto;
 import com.bookmyshow.Models.Movie;
 import com.bookmyshow.Services.MovieService;
 import jakarta.validation.Valid;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +31,7 @@ public class MovieController {
         Movie movie = movieService.getMovieByName(name);
         return new ResponseEntity<>(movie, HttpStatus.OK);
     }
-
+    
     @GetMapping("/totalCollection/{movieId}")
     public ResponseEntity<Long> totalCollection(@PathVariable Integer movieId) {
         try {
@@ -63,6 +66,7 @@ public class MovieController {
         movieService.updateMovie(id, movieEntryDto);
         return new ResponseEntity<>("Movie updated successfully", HttpStatus.OK);
     }
+
 
 
 }
