@@ -168,12 +168,7 @@ public class ShowServiceImpl implements ShowService {
 		// TODO Auto-generated method stub
 		movieRepository.findById(movieId).orElseThrow(MovieDoesNotExists::new);
 		theatreRepository.findById(theaterId).orElseThrow(TheaterDoesNotExists::new);
-		List<Integer> showIds = showRepository.getAllShowsOfMovieInTheater(movieId, theaterId);
-		List<Show> shows = new java.util.ArrayList<>();
-		for (Integer showId : showIds) {
-			Optional<Show> optShow = showRepository.findById(showId);
-			shows.add(optShow.get());
-		}
+		List<Show> shows = showRepository.getAllShowsOfMovieInTheater(movieId, theaterId);
 		return shows;
 	}
 
@@ -181,12 +176,7 @@ public class ShowServiceImpl implements ShowService {
 	public List<Show> getAllShowByMovie(int movieId) {
 		// TODO Auto-generated method stub
 		movieRepository.findById(movieId).orElseThrow(MovieDoesNotExists::new);
-		List<Integer> showIds = showRepository.getAllShowsOfMovie(movieId);
-		List<Show> shows = new java.util.ArrayList<>();
-		for (Integer showId : showIds) {
-			Optional<Show> optShow = showRepository.findById(showId);
-			shows.add(optShow.get());
-		}
+		List<Show> shows = showRepository.getAllShowsOfMovie(movieId);
 		return shows;
 	}
 

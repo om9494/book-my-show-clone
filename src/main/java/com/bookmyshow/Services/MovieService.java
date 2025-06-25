@@ -1,6 +1,7 @@
 package com.bookmyshow.Services;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import java.util.Optional;
 
@@ -15,6 +16,7 @@ import com.bookmyshow.Models.Show;
 import com.bookmyshow.Models.Ticket;
 import com.bookmyshow.Repositories.MovieRepository;
 import com.bookmyshow.Repositories.ShowRepository;
+import com.bookmyshow.Repositories.TicketRepository;
 import com.bookmyshow.Transformers.MovieTransformer;
 
 @Service
@@ -44,6 +46,9 @@ public class MovieService {
     @Autowired
     private ShowRepository showRepository;
 
+    @Autowired
+    private TicketRepository ticketRepository;
+
     public Long totalCollection(Integer movieId) throws MovieDoesNotExists {
         Optional<Movie> movieOpt = movieRepository.findById(movieId);
         if (movieOpt.isEmpty()) {
@@ -51,11 +56,11 @@ public class MovieService {
         }
 
         List<Show> showListOfMovie = showRepository.getAllShowsOfMovie(movieId);
-
+        
         long amount = 0;
         for (Show show : showListOfMovie) {
-            for (Ticket ticket : show.getTicketList()) {
-                amount += ticket.getTotalTicketsPrice(); // Assuming this returns int or long
+            for (Ticket ticket : ticketRepository.findByShowId(show.getShowId())) {
+                amount += ticket.getTicketPrice(); // Assuming this returns int or long
             }
         }
 
