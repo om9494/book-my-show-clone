@@ -3,14 +3,9 @@ package com.bookmyshow.Controllers;
 import com.bookmyshow.Dtos.RequestDtos.ShowEntryDto;
 import com.bookmyshow.Dtos.RequestDtos.ShowSeatEntryDto;
 import com.bookmyshow.Dtos.RequestDtos.ShowTimingsDto;
-import com.bookmyshow.Exceptions.MovieDoesNotExists;
-import com.bookmyshow.Exceptions.ShowDoesNotExists;
-import com.bookmyshow.Exceptions.TheaterDoesNotExists;
 import com.bookmyshow.Models.Show;
 import com.bookmyshow.Services.ShowService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Time;
@@ -18,8 +13,6 @@ import java.util.List;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
 
 @RestController
 @RequestMapping("/shows")

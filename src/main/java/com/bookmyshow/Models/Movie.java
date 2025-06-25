@@ -11,8 +11,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Column;
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
 
 import jakarta.persistence.Enumerated;
 import com.bookmyshow.Enums.Genre;
