@@ -206,3 +206,185 @@ Language:
 - Movie names should be unique per language.
 - You can further extend with filtering (e.g., by genre/language), pagination, etc.
 - All requests and responses follow REST best practices and return appropriate HTTP status codes.
+
+
+# 🎟️ BookingController - BookMyShow Clone
+
+The `BookingController` handles all operations related to booking movie tickets in the BookMyShow clone application. This includes creating bookings (ticket reservations), retrieving booking details, listing user bookings, and canceling tickets.
+
+---
+
+## 📁 Controller: `BookingController.java`
+
+### 🔗 Base URL
+
+```
+/bookings
+```
+
+---
+
+## ✅ Endpoints
+
+---
+
+### 1. Book Ticket
+
+- **URL:** `POST /bookings`
+- **Description:** Book seats for a show by a specific user.
+- **Request Body:**
+
+```json
+{
+  "userId": 1,
+  "showId": 5,
+  "seatNumbers": ["A1", "A2", "A3"]
+}
+```
+
+- **Success Response:**
+
+```http
+201 Created
+Booking successful! Ticket ID: 12
+```
+
+- **Failure Response:**
+
+```http
+400 Bad Request
+Booking failed: Some seats are already booked or do not exist.
+```
+
+---
+
+### 2. Get Booking by ID
+
+- **URL:** `GET /bookings/{id}`
+- **Description:** Fetch detailed information of a booking using its ticket ID.
+- **Path Variable:** `id` - Ticket ID
+- **Success Response:**
+
+```json
+{
+  "ticketId": 12,
+  "totalTicketsPrice": 450,
+  "bookedSeats": "A1,A2,A3",
+  "bookedAt": "2025-06-28",
+  "show": { ... },
+  "user": { ... }
+}
+```
+
+- **Failure Response:**
+
+```http
+404 Not Found
+Booking not found
+```
+
+---
+
+### 3. Get All Bookings by User
+
+- **URL:** `GET /bookings/user/{userId}`
+- **Description:** Retrieve all bookings made by a specific user.
+- **Path Variable:** `userId` - User ID
+- **Success Response:**
+
+```json
+[
+  {
+    "ticketId": 12,
+    "totalTicketsPrice": 450,
+    "bookedSeats": "A1,A2,A3",
+    "bookedAt": "2025-06-28",
+    "show": { ... }
+  },
+  {
+    "ticketId": 14,
+    "totalTicketsPrice": 300,
+    "bookedSeats": "B1,B2",
+    "bookedAt": "2025-06-29",
+    "show": { ... }
+  }
+]
+```
+
+---
+
+### 4. Cancel Booking
+
+- **URL:** `DELETE /bookings/{id}`
+- **Description:** Cancel a booking and free up the associated seats.
+- **Path Variable:** `id` - Ticket ID
+- **Success Response:**
+
+```http
+200 OK
+Booking cancelled successfully.
+```
+
+- **Failure Response:**
+
+```http
+400 Bad Request
+Cancellation failed: Booking not found
+```
+
+---
+
+## 📦 Related DTO
+
+### `BookingRequestDto.java`
+
+```java
+@Data
+public class BookingRequestDto {
+    private Integer userId;
+    private Integer showId;
+    private List<String> seatNumbers;
+}
+```
+
+---
+
+## 🧠 Notes
+
+- Booking fails if:
+  - Any selected seat is already booked.
+  - User or Show ID is invalid.
+- When a booking is canceled:
+  - The seats become available again for others to book.
+- Each ticket is linked to:
+  - A `User`
+  - A `Show`
+  - A list of `ShowSeats` via seat numbers stored as CSV.
+
+---
+
+## 📂 Related Exception
+
+### `UserDoesNotExist.java`
+
+```java
+public class UserDoesNotExist extends RuntimeException {
+    public UserDoesNotExist() {
+        super("User does not exist with the provided ID.");
+    }
+}
+```
+
+---
+
+## ✅ Tips for Testing
+
+- Use Postman or Swagger UI to test the endpoints.
+- Make sure `ShowSeat` data is preloaded and marked available before testing bookings.
+- Always test edge cases:
+  - Same seat booked twice.
+  - Booking with wrong user or show ID.
+
+---
+
+> Created with ❤️ by your BookMyShow Clone Dev Team.
