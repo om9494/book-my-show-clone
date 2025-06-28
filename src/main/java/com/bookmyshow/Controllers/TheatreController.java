@@ -1,9 +1,9 @@
-package com.example.Super30_Project.Controller;
+package com.bookmyshow.Controllers;
 
 
-import com.example.Super30_Project.Dtos.TheatreDto;
-import com.example.Super30_Project.Services.TheatreService;
-import com.example.Super30_Project.Entity.Theatre;
+import com.bookmyshow.Dtos.RequestDtos.TheatreDto;
+import com.bookmyshow.Services.TheatreService;
+import com.bookmyshow.Models.Theater;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +37,7 @@ public class TheatreController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<Theatre>> getAllTheatres() {
+    public ResponseEntity<List<Theater>> getAllTheatres() {
         return ResponseEntity.ok(theatreService.getAllTheatres());
         /*
         ResponseEntity.ok(data) is a shortcut for: new ResponseEntity<>(data, HttpStatus.OK)
@@ -49,7 +49,7 @@ public class TheatreController {
     }
 
     @GetMapping("/city/{name}")
-    public ResponseEntity<List<Theatre>> getTheatresByCity(@PathVariable String name) {
+    public ResponseEntity<List<Theater>> getTheatresByCity(@PathVariable String name) {
         return ResponseEntity.ok(theatreService.getTheatresByCity(name));
     }
 
