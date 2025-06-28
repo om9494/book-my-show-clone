@@ -48,11 +48,14 @@
 
 
         <!-- Lombok -->
+
 <dependency>
     <groupId>org.projectlombok</groupId>
-    <artifactId>lombok</artifactId> <!-- Use latest stable version -->
+    <artifactId>lombok</artifactId>
+    <version>1.18.30</version> <!-- Use latest version -->
     <scope>provided</scope>
 </dependency>
+
         <!-- Jakarta Persistence API -->
         <dependency>
             <groupId>jakarta.persistence</groupId>
@@ -74,7 +77,10 @@
     <groupId>org.hibernate.validator</groupId>
     <artifactId>hibernate-validator</artifactId>
 </dependency>
-
+<dependency>
+    <groupId>jakarta.validation</groupId>
+    <artifactId>jakarta.validation-api</artifactId>
+</dependency>
     </dependencies>
 
     <build>

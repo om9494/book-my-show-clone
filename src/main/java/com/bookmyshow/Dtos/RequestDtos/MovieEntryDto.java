@@ -2,12 +2,15 @@ package com.bookmyshow.Dtos.RequestDtos;
 import java.sql.Date;
 
 
+
 import com.bookmyshow.Enums.Genre;
 import com.bookmyshow.Enums.Language;
 
 import lombok.Data;
 import jakarta.validation.constraints.*;
-
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 @Data
 public class MovieEntryDto {
 	 @NotBlank(message = "Movie name is required")
