@@ -1,16 +1,14 @@
-package com.bookmyshow.Services;
+package com.example.Super30_Project.Services;
 
+import com.example.Super30_Project.Dtos.TheatreDto;
+import com.example.Super30_Project.Entity.Theatre;
 
 import java.util.List;
 
-
-import com.bookmyshow.Dtos.RequestDtos.TheatreDto;
-import com.bookmyshow.Models.Theater;
-
 public interface TheatreService {
     String addTheatre(TheatreDto theatreDto);
-    List<Theater> getAllTheatres();
-    List<Theater> getTheatresByCity(String city);
+    List<Theatre> getAllTheatres();
+    List<Theatre> getTheatresByCity(String city);
     String updateTheatre(int id , TheatreDto theatreDto);
     String deleteTheatre(int id);
 }
