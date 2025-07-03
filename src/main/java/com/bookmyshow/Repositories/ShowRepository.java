@@ -17,9 +17,12 @@ public interface ShowRepository extends JpaRepository<Show, Integer> {
 
     @Query(value = "SELECT s.movie_id FROM shows s GROUP BY s.movie_id ORDER BY COUNT(*) DESC LIMIT 1", nativeQuery = true)
     public Integer getMostShowsMovieId();
-    
-    @Query(value = "SELECT * FROM shows s WHERE s.movie_id = ?1", nativeQuery = true)
-    List<Show> getAllShowsOfMovie(Integer movieId);
 
+    //All shows of a movie in a specific theater
+    @Query(value = "SELECT * FROM shows WHERE movie_id = ?1 AND theatre_id = ?2", nativeQuery = true)
+    public List<Show> getAllShowsOfMovieInTheater(Integer movieId, Integer theaterId);
 
+    //All shows for a movie
+    @Query(value = "SELECT * FROM shows WHERE movie_id = ?1", nativeQuery = true)
+    public List<Show> getAllShowsOfMovie(Integer movieId);
 }
