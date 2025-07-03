@@ -21,6 +21,8 @@ import com.bookmyshow.Models.Theater;
 import com.bookmyshow.Models.TheaterSeat;
 import com.bookmyshow.Repositories.MovieRepository;
 import com.bookmyshow.Repositories.ShowRepository;
+import com.bookmyshow.Repositories.ShowSeatRepositiory;
+import com.bookmyshow.Repositories.TheaterSeatRepository;
 import com.bookmyshow.Repositories.TheatreRepository;
 import com.bookmyshow.Transformers.ShowTransformer;
 
@@ -34,6 +36,13 @@ public class ShowServiceImpl implements ShowService {
 
 	@Autowired
 	private TheatreRepository theatreRepository;
+
+	@Autowired
+	private TheaterSeatRepository theaterSeatRepository;
+
+	@Autowired
+	private ShowSeatRepositiory showSeatRepository;
+
 
 	@Override
 	public String addShow(ShowEntryDto showEntryDto) throws MovieDoesNotExists, TheaterDoesNotExists {
@@ -93,9 +102,9 @@ public class ShowServiceImpl implements ShowService {
 
 		Theater theater = show.getTheatre();
 
-		List<TheaterSeat> theaterSeats = theater.getTheaterSeatList();
+		List<TheaterSeat> theaterSeats = theaterSeatRepository.findAllByTheaterId(theater.getId());
 
-		List<ShowSeat> showSeatList = show.getShowSeatList();
+		List<ShowSeat> showSeatList = showSeatRepository.findByShowId(show.getShowId());
 
 		for (TheaterSeat theaterSeat : theaterSeats) {
 			ShowSeat showSeat = ShowSeat.builder()
@@ -150,6 +159,24 @@ public class ShowServiceImpl implements ShowService {
 		// TODO Auto-generated method stub
 		Show show = showRepository.findById(id).orElseThrow(ShowDoesNotExists::new);
 		return show;
+	}
+
+	@Override
+	public List<Show> getShowByMovieAndTheater(int movieId, int theaterId)
+			throws MovieDoesNotExists, TheaterDoesNotExists {
+		// TODO Auto-generated method stub
+		movieRepository.findById(movieId).orElseThrow(MovieDoesNotExists::new);
+		theatreRepository.findById(theaterId).orElseThrow(TheaterDoesNotExists::new);
+		List<Show> shows = showRepository.getAllShowsOfMovieInTheater(movieId, theaterId);
+		return shows;
+	}
+
+	@Override
+	public List<Show> getAllShowByMovie(int movieId) {
+		// TODO Auto-generated method stub
+		movieRepository.findById(movieId).orElseThrow(MovieDoesNotExists::new);
+		List<Show> shows = showRepository.getAllShowsOfMovie(movieId);
+		return shows;
 	}
 
 }
