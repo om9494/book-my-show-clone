@@ -100,12 +100,23 @@ public class ShowServiceImpl implements ShowService {
 		Show show = showRepository.findById(showSeatEntryDto.getShowId())
 				.orElseThrow(ShowDoesNotExists::new);
 
+		System.out.println("Show " + show);
+
 		Theater theater = show.getTheatre();
 
+		System.out.println("Theater " + theater);
+
 		List<TheaterSeat> theaterSeats = theaterSeatRepository.findAllByTheaterId(theater.getId());
+		if (theaterSeats.isEmpty()) {
+			return "No seats available in the theater.";
+		}
 
 		List<ShowSeat> showSeatList = showSeatRepository.findByShowId(show.getShowId());
-
+		if (!showSeatList.isEmpty()) {
+			return "Show seats have already been associated for this show.";
+		}
+		showSeatList.clear(); // Clear existing seats if any
+		System.out.println("Theater Seats: " + theaterSeats);
 		for (TheaterSeat theaterSeat : theaterSeats) {
 			ShowSeat showSeat = ShowSeat.builder()
 					.show(show)
@@ -118,8 +129,12 @@ public class ShowServiceImpl implements ShowService {
 									? showSeatEntryDto.getPriceOfClassicSeat()
 									: showSeatEntryDto.getPriceOfPremiumSeat())
 					.build();
+			// System.out.println("Show Seat: " + showSeat);
 			showSeatList.add(showSeat);
 		}
+		// Save all show seats in the repository
+		showSeatRepository.saveAll(showSeatList);
+		// Associate the show seats with the show
 		showRepository.save(show);
 		
 		return "Show seats have been associated successfully!";

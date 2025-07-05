@@ -35,12 +35,21 @@ public class AuthController {
             return new ResponseEntity<>("All fields are required", HttpStatus.BAD_REQUEST);
         }
 
+        else{
+            System.out.println("Received registration request: " + request);
+        }
+
         Integer age = Integer.parseInt(ageStr);
 
         Role role = Role.USER;
+        System.out.println("RoleStr: " + roleStr);
         if (roleStr != null && roleStr.equalsIgnoreCase("ADMIN")) {
             role = Role.ADMIN;
+            System.out.println("Role set to ADMIN for user: " + username);
         }
+
+        //log
+        System.out.println("User registration details: " + request);
 
         String result = userService.registerUser(username, password, name, gender, age,
                 phoneNumber, email, Set.of(role));
