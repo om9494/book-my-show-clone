@@ -33,7 +33,4 @@ public class User {
     @Column(unique = true)
     private String emailId;
     
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Ticket> ticketList = new ArrayList<>();
-    
 }

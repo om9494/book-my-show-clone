@@ -8,13 +8,13 @@ public class TicketTransformer {
 
     public static TicketResponseDto returnTicket(Show show, Ticket ticket) {
         TicketResponseDto ticketResponseDto = TicketResponseDto.builder()
-                .bookedSeats(ticket.getBookedSeats())
-                .address(show.getTheater().getAddress())
-                .theaterName(show.getTheater().getName())
+                .bookedSeats(ticket.getShowSeat() != null ? ticket.getShowSeat().getSeatNo() : null)
+                .address(show.getTheatre().getAddress())
+                .theaterName(show.getTheatre().getName())
                 .movieName(show.getMovie().getMovieName())
                 .date(show.getDate())
                 .time(show.getTime())
-                .totalPrice(ticket.getTotalTicketsPrice())
+                .totalPrice(ticket.getTicketPrice())
                 .build();
 
         return ticketResponseDto;

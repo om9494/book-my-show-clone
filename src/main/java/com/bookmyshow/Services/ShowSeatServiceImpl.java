@@ -10,13 +10,13 @@ import com.bookmyshow.Exceptions.ShowDoesNotExists;
 import com.bookmyshow.Exceptions.ShowSeatDoesNotExists;
 import com.bookmyshow.Models.ShowSeat;
 import com.bookmyshow.Repositories.ShowRepository;
-import com.bookmyshow.Repositories.ShowSeatRepositiory;
+import com.bookmyshow.Repositories.ShowSeatRepository;
 
 @Service
 public class ShowSeatServiceImpl implements ShowSeatService {
 
     @Autowired
-    private ShowSeatRepositiory showSeatRepositiory;
+    private ShowSeatRepository showSeatRepositiory;
 
     @Autowired
     private ShowRepository showRepository;

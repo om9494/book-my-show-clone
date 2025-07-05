@@ -21,7 +21,7 @@ import com.bookmyshow.Models.Theater;
 import com.bookmyshow.Models.TheaterSeat;
 import com.bookmyshow.Repositories.MovieRepository;
 import com.bookmyshow.Repositories.ShowRepository;
-import com.bookmyshow.Repositories.ShowSeatRepositiory;
+import com.bookmyshow.Repositories.ShowSeatRepository;
 import com.bookmyshow.Repositories.TheaterSeatRepository;
 import com.bookmyshow.Repositories.TheatreRepository;
 import com.bookmyshow.Transformers.ShowTransformer;
@@ -41,7 +41,7 @@ public class ShowServiceImpl implements ShowService {
 	private TheaterSeatRepository theaterSeatRepository;
 
 	@Autowired
-	private ShowSeatRepositiory showSeatRepository;
+	private ShowSeatRepository showSeatRepository;
 
 
 	@Override

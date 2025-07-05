@@ -35,34 +35,34 @@ public class BookingServiceImpl implements BookingService {
         Show show = showRepository.findById(dto.getShowId())
                 .orElseThrow(ShowDoesNotExists::new);
 
-        List<ShowSeat> showSeats = show.getShowSeatList();
+        List<ShowSeat> showSeats = showSeatRepository.findByShowId(show.getShowId());
+        List<String> requestedSeatNumbers = dto.getSeatNumbers();
+        List<Integer> ticketIds = new ArrayList<>();
 
-        List<ShowSeat> bookedSeats = showSeats.stream()
-                .filter(seat -> dto.getSeatNumbers().contains(seat.getSeatNo()) && seat.getIsAvailable())
-                .collect(Collectors.toList());
+        for (String seatNo : requestedSeatNumbers) {
+            ShowSeat seatToBook = null;
+            for (ShowSeat seat : showSeats) {
+                if (seat.getSeatNo().equals(seatNo)) {
+                    seatToBook = seat;
+                    break;
+                }
+            }
+            if (seatToBook == null || !seatToBook.getIsAvailable()) {
+                throw new RuntimeException("Seat " + seatNo + " is already booked or does not exist.");
+            }
+            seatToBook.setIsAvailable(false);
+            showSeatRepository.save(seatToBook);
 
-        if (bookedSeats.size() != dto.getSeatNumbers().size()) {
-            throw new RuntimeException("Some seats are already booked or do not exist.");
+            Ticket ticket = Ticket.builder()
+                    .show(show)
+                    .user(user)
+                    .showSeat(seatToBook)
+                    .ticketPrice(seatToBook.getPrice())
+                    .build();
+            ticketRepository.save(ticket);
+            ticketIds.add(ticket.getTicketId());
         }
-
-        int totalPrice = 0;
-        for (ShowSeat seat : bookedSeats) {
-            seat.setIsAvailable(false);
-            totalPrice += seat.getPrice();
-        }
-
-        Ticket ticket = Ticket.builder()
-                .show(show)
-                .user(user)
-                .totalTicketsPrice(totalPrice)
-                .bookedSeats(String.join(",", dto.getSeatNumbers()))
-                .build();
-
-        show.getTicketList().add(ticket);
-        user.getTicketList().add(ticket);
-
-        ticketRepository.save(ticket);
-        return "Booking successful! Ticket ID: " + ticket.getTicketId();
+        return "Booking successful! Ticket IDs: " + ticketIds;
     }
 
     @Override
@@ -73,9 +73,10 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<Ticket> getBookingsByUserId(Integer userId) {
-        User user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        return user.getTicketList();
+        // Fetch tickets by userId from the repository
+        return ticketRepository.findByUserId(userId);
     }
 
     @Override
@@ -83,16 +84,12 @@ public class BookingServiceImpl implements BookingService {
         Ticket ticket = ticketRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-        // Set seats as available again
-        Show show = ticket.getShow();
-        List<String> seatsToFree = Arrays.asList(ticket.getBookedSeats().split(","));
-
-        for (ShowSeat seat : show.getShowSeatList()) {
-            if (seatsToFree.contains(seat.getSeatNo())) {
-                seat.setIsAvailable(true);
-            }
+        // Set the booked seat as available again
+        ShowSeat seat = ticket.getShowSeat();
+        if (seat != null) {
+            seat.setIsAvailable(true);
+            showSeatRepository.save(seat);
         }
-
         ticketRepository.delete(ticket);
     }
 }

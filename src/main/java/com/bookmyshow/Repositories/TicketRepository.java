@@ -7,9 +7,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.bookmyshow.Models.Ticket;
+import com.bookmyshow.Models.User;
 
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, Integer> {
     @Query(value = "Select * from tickets where show_show_id = ?1", nativeQuery = true)
     public List<Ticket> findByShowId(int showId);
+
+    @Query(value = "Select * from tickets where user_id = ?1", nativeQuery = true)
+    public List<Ticket> findByUserId(int userId);
 }

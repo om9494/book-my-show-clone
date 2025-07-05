@@ -30,7 +30,4 @@ public class Theater {
     private String city;
     private int numberOfScreens;
 
-    @OneToMany(mappedBy = "theater", cascade = CascadeType.ALL)
-    private List<TheaterSeat> theaterSeatList = new ArrayList<>();
-
 }
