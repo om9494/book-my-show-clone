@@ -1,4 +1,4 @@
-// GlobalExceptionHandler.java
+
 package com.bookmyshow.Exceptions;
 
 import org.springframework.http.HttpStatus;
@@ -29,8 +29,14 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(RequestedSeatAreNotAvailable.class)
+    public ResponseEntity<String> handleSeatAlreadyBooked(RequestedSeatAreNotAvailable ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT); // 409 for "already booked"
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGeneralException(Exception ex) {
         return new ResponseEntity<>("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
+

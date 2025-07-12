@@ -55,7 +55,7 @@ public class TicketService {
 
         List<String> requestedSeats = ticketEntryDto.getRequestSeats();
         if (requestedSeats == null || requestedSeats.size() != 1) {
-            throw new RequestedSeatAreNotAvailable(); // Only one seat per ticket as per model
+            throw new RequestedSeatAreNotAvailable("Seat " + requestedSeats + " is already booked."); // Only one seat per ticket as per model
         }
         String requestedSeatNo = requestedSeats.get(0);
 
@@ -64,7 +64,7 @@ public class TicketService {
         for (ShowSeat seat : showSeatList) {
             if (seat.getSeatNo().equals(requestedSeatNo)) {
                 if (!seat.getIsAvailable()) {
-                    throw new RequestedSeatAreNotAvailable();
+                    throw new RequestedSeatAreNotAvailable("Seat " + requestedSeatNo + " is already booked.");
                 }
                 bookedSeat = seat;
                 break;

@@ -35,7 +35,7 @@ public class ShowSeat {
 	private Boolean isFoodContains;
 	
 	@ManyToOne
-    @JoinColumn
+    @JoinColumn(name = "show_id") 
 	private Show show;
 	
 }
