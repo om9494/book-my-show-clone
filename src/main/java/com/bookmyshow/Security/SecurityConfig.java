@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/signup/register", "/signup/login").permitAll()
+                        .requestMatchers("/signup/register", "/signup/login", "/movies/all", "/movies/id/**", "/movies/totalCollection/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/signup/profile").authenticated()
                         .requestMatchers("/movies/add", "/movies/*/").hasRole("ADMIN")
@@ -48,10 +48,8 @@ public class SecurityConfig {
                         .requestMatchers("/shows/associateShowSeats").hasRole("ADMIN")
                         .requestMatchers("/theaters/addTheater", "/theaters/updateTheater/**", "/theaters/deleteTheater/**").hasRole("ADMIN")
                         .requestMatchers("/theater-seats/addTheaterSeat", "/theater-seats/updateTheaterSeat/**", "/theater-seats/deleteTheaterSeat/**").hasRole("ADMIN")
-                        .requestMatchers("/theaters/getAllTheaters", "/theaters/getTheaterById/**", "/theaters/getTheaterByCity/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/theaters/city/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/theater-seats/getSeatsByTheater/**").hasAnyRole("USER", "ADMIN")
-
-                        .requestMatchers("/movies/all", "/movies/id/**", "/movies/totalCollection/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/shows/getAllShows", "/shows/getShowById/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/shows/showTimingsOnDate", "/shows/movieHavingMostShows").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/seats/**").hasAnyRole("USER", "ADMIN")
