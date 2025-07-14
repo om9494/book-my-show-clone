@@ -1,9 +1,9 @@
 package com.bookmyshow.Security;
 
-import com.bookmyshow.Config.PasswordConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -11,7 +11,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import com.bookmyshow.Config.PasswordConfig.*;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.bookmyshow.config.JwtAuthFilter;
+import com.bookmyshow.config.PasswordConfig;
+import com.bookmyshow.config.PasswordConfig.*;
 
 @Configuration
 @EnableWebSecurity
@@ -27,6 +31,9 @@ public class SecurityConfig {
 //        return new BCryptPasswordEncoder();
 //    }
 
+    @Autowired
+    private JwtAuthFilter jwtAuthFilter;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -34,7 +41,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/signup/register", "/signup/login").permitAll()
-
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/signup/profile").authenticated()
                         .requestMatchers("/movies/add", "/movies/*/").hasRole("ADMIN")
                         .requestMatchers("/shows/addShow", "/shows/updateShow/**", "/shows/deleteShow/**").hasRole("ADMIN")
                         .requestMatchers("/shows/associateShowSeats").hasRole("ADMIN")
@@ -52,7 +60,8 @@ public class SecurityConfig {
 
                         .anyRequest().authenticated()
                 )
-                .httpBasic(httpBasic -> {});
+                .httpBasic(httpBasic -> {})
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
