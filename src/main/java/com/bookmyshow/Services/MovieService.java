@@ -98,7 +98,9 @@ public class MovieService {
 
         movieRepository.save(movie);
     }
-
-
+   
+    public List<Movie> searchMoviesByName(String name) {
+        return movieRepository.findByMovieNameContainingIgnoreCase(name);
+    }
 
 }
