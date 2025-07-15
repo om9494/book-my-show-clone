@@ -2,6 +2,7 @@
 package com.bookmyshow.Controllers;
 
 import com.bookmyshow.Dtos.RequestDtos.MovieEntryDto;
+
 import com.bookmyshow.Models.Movie;
 import com.bookmyshow.Services.MovieService;
 import jakarta.validation.Valid;
@@ -65,6 +66,12 @@ public class MovieController {
                                               @RequestBody @Valid MovieEntryDto movieEntryDto) {
         movieService.updateMovie(id, movieEntryDto);
         return new ResponseEntity<>("Movie updated successfully", HttpStatus.OK);
+    }
+    
+    @GetMapping("/search")
+    public ResponseEntity<List<Movie>> searchMovies(@RequestParam String name) {
+        List<Movie> movies = movieService.searchMoviesByName(name);
+        return ResponseEntity.ok(movies);
     }
 
 
