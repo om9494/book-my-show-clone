@@ -21,6 +21,13 @@ public class TheaterSeatController {
         String result = theaterSeatService.addTheaterSeat(dto);
         return ResponseEntity.ok(result);
     }
+    
+    // New bulk-seat endpoint
+    @PostMapping("/bulk")
+    public ResponseEntity<String> addBulkTheaterSeats(@RequestBody List<TheaterSeatEntryDto> dtos) {
+        String result = theaterSeatService.addBulkTheaterSeats(dtos);
+        return ResponseEntity.ok(result);
+    }
 
     @GetMapping("/theater/{theaterId}")
     public ResponseEntity<List<TheaterSeat>> getSeatsByTheater(@PathVariable Integer theaterId) {

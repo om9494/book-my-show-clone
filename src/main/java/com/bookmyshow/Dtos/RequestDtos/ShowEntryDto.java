@@ -7,8 +7,8 @@ import lombok.Data;
 
 @Data
 public class ShowEntryDto {
-    private Time showStartTime;
-    private Date showDate;
+    private Time time; // Changed from showStartTime
+    private Date date; // Changed from showDate
     private Integer theaterId;
     private Integer movieId;
 }
