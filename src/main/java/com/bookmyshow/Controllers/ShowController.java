@@ -5,6 +5,7 @@ import com.bookmyshow.Dtos.RequestDtos.ShowSeatEntryDto;
 import com.bookmyshow.Dtos.RequestDtos.ShowTimingsAllTheaterDto;
 import com.bookmyshow.Dtos.RequestDtos.ShowTimingsDto;
 import com.bookmyshow.Exceptions.MovieDoesNotExists;
+import com.bookmyshow.Models.SeatPrice;
 import com.bookmyshow.Models.Show;
 import com.bookmyshow.Services.ShowService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,7 +84,7 @@ public class ShowController {
     }
 
     @GetMapping("/theaterAndShowTimingsByMovie")
-    public HashMap<Integer, List<Time>> theaterAndShowTimingsByMovie(
+    public HashMap<Integer, HashMap<Integer, Time>> theaterAndShowTimingsByMovie(
             @RequestParam(name = "movieId") Integer movieId,
             @RequestParam(name = "city") String city,
             @RequestParam(name = "date") Date date
@@ -93,6 +94,15 @@ public class ShowController {
             System.out.println("Fetching theater and show timings for movie ID: " + movieId + " on date: " + date + " in city: " + city);
             return showService.getTheaterAndShowTimingsByMovie(movieId, date, city); 
         } catch (MovieDoesNotExists e) {
+            return null;
+        }
+    }
+
+    @GetMapping("/seat/prices/{showId}")
+    public HashMap<String, Integer> getSeatsPrices(@PathVariable Integer showId) {
+        try {
+            return showService.getSeatsPrices(showId);
+        } catch (Exception e) {
             return null;
         }
     }

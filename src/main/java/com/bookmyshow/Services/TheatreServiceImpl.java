@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bookmyshow.Dtos.RequestDtos.TheatreDto;
+import com.bookmyshow.Exceptions.TheaterDoesNotExists;
 import com.bookmyshow.Models.Theater;
 import com.bookmyshow.Repositories.TheatreRepository;
 
@@ -35,6 +36,12 @@ public class TheatreServiceImpl implements TheatreService {
     @Override
     public List<Theater> getTheatresByCity(String city) {
         return theatreRepository.findByCityIgnoreCase(city);
+    }
+
+    @Override
+    public Theater getTheatreById(int id) throws TheaterDoesNotExists {
+        Theater theatre = theatreRepository.findById(id).orElseThrow(TheaterDoesNotExists::new);
+        return theatre;
     }
 
     @Override

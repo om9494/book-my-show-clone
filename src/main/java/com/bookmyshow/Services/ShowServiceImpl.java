@@ -19,6 +19,7 @@ import com.bookmyshow.Exceptions.MovieDoesNotExists;
 import com.bookmyshow.Exceptions.ShowDoesNotExists;
 import com.bookmyshow.Exceptions.TheaterDoesNotExists;
 import com.bookmyshow.Models.Movie;
+import com.bookmyshow.Models.SeatPrice;
 import com.bookmyshow.Models.Show;
 import com.bookmyshow.Models.ShowSeat;
 import com.bookmyshow.Models.Theater;
@@ -159,16 +160,20 @@ public class ShowServiceImpl implements ShowService {
 	}
 
 	@Override
-	public HashMap<Integer, List<Time>> getTheaterAndShowTimingsByMovie(Integer movieId, Date date, String city) throws MovieDoesNotExists, TheaterDoesNotExists {
+	public HashMap<Integer, HashMap<Integer, Time>> getTheaterAndShowTimingsByMovie(Integer movieId, Date date, String city) throws MovieDoesNotExists, TheaterDoesNotExists {
 			System.out.println("Internal Fetching theater and show timings for movie ID: " + movieId + " on date: " + date);
 			movieRepository.findById(movieId).orElseThrow(MovieDoesNotExists::new);
 			List<Theater> theaters = theatreRepository.findByCity(city);
 			if (theaters.isEmpty()) {
 				throw new TheaterDoesNotExists();
 			}
-			HashMap<Integer, List<Time>> theaterShowTimingsMap = new HashMap<>();
+			HashMap<Integer, HashMap<Integer, Time>> theaterShowTimingsMap = new HashMap<>();
 			for (Theater theater : theaters) {
-				List<Time> showTimings = showRepository.getShowTimingsOnDate(date, theater.getId(), movieId);
+				List<Show> show = showRepository.getTheaterAndShowTimingsByMovie(movieId, date, theater.getId());
+				HashMap<Integer, Time> showTimings = new HashMap<>();
+				for (Show s : show) {
+					if(s.getTheatre().getId() == theater.getId()) showTimings.put(s.getShowId(), s.getTime());
+				}
 				theaterShowTimingsMap.put(theater.getId(), showTimings);
 			}
 			return theaterShowTimingsMap;
@@ -218,5 +223,16 @@ public class ShowServiceImpl implements ShowService {
 		List<Show> shows = showRepository.getAllShowsOfMovie(movieId);
 		return shows;
 	}
+
+	@Override
+	public HashMap<String, Integer> getSeatsPrices(Integer showId) throws ShowDoesNotExists {
+		Show show = showRepository.findById(showId).orElseThrow(ShowDoesNotExists::new);
+		List<SeatPrice> showSeats = showSeatRepository.getSeatsPrices(show.getShowId());
+		HashMap<String, Integer> seatPrices = new HashMap<>();
+		for (SeatPrice seatPrice : showSeats) {
+			seatPrices.put(seatPrice.getSeatType(), seatPrice.getPrice());
+		}
+		return seatPrices;
+	}	
 
 }

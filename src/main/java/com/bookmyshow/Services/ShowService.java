@@ -25,6 +25,7 @@ public interface ShowService {
 	public List<Show> getAllShowByMovie(int movieId);
 	public String associateShowSeats(ShowSeatEntryDto showSeatEntryDto) throws ShowDoesNotExists;
 	public List<Time> showTimingsOnDate(ShowTimingsDto showTimingsDto);
-	public HashMap<Integer, List<Time>> getTheaterAndShowTimingsByMovie(Integer movieId, Date date, String city) throws MovieDoesNotExists, TheaterDoesNotExists;
+	public HashMap<Integer, HashMap<Integer, Time>> getTheaterAndShowTimingsByMovie(Integer movieId, Date date, String city) throws MovieDoesNotExists, TheaterDoesNotExists;
 	public String movieHavingMostShows();
+	public HashMap<String, Integer> getSeatsPrices(Integer showId) throws ShowDoesNotExists;
 }
