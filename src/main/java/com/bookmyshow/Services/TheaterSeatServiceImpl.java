@@ -27,7 +27,8 @@ public class TheaterSeatServiceImpl implements TheaterSeatService {
             return "Theater not found";
         }
         TheaterSeat seat = TheaterSeat.builder()
-                .seatNo(dto.getSeatNo())
+                .rowLabel(dto.getRowLabel())
+                .seatCount(dto.getSeatCount())
                 .seatType(dto.getSeatType())
                 .theater(theaterOpt.get())
                 .build();
@@ -47,7 +48,8 @@ public class TheaterSeatServiceImpl implements TheaterSeatService {
             return "Theater seat not found";
         }
         TheaterSeat seat = seatOpt.get();
-        seat.setSeatNo(dto.getSeatNo());
+        seat.setRowLabel(dto.getRowLabel());
+        seat.setSeatCount(dto.getSeatCount());
         seat.setSeatType(dto.getSeatType());
         if (dto.getTheaterId() != null) {
             Optional<Theater> theaterOpt = theatreRepository.findById(dto.getTheaterId());

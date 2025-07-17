@@ -2,17 +2,18 @@ package com.bookmyshow.Controllers;
 
 import com.bookmyshow.Dtos.RequestDtos.ShowEntryDto;
 import com.bookmyshow.Dtos.RequestDtos.ShowSeatEntryDto;
+import com.bookmyshow.Dtos.RequestDtos.ShowTimingsAllTheaterDto;
 import com.bookmyshow.Dtos.RequestDtos.ShowTimingsDto;
+import com.bookmyshow.Exceptions.MovieDoesNotExists;
 import com.bookmyshow.Models.Show;
 import com.bookmyshow.Services.ShowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Date;
 import java.sql.Time;
 import java.util.List;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.GetMapping;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/shows")
@@ -77,7 +78,23 @@ public class ShowController {
 
     @GetMapping("/showTimingsOnDate")
     public List<Time> showTimingsOnDate(@RequestBody ShowTimingsDto showTimingsDto) {
+        System.out.println("Fetching show timings for date: " + showTimingsDto.getDate());
         return showService.showTimingsOnDate(showTimingsDto);
+    }
+
+    @GetMapping("/theaterAndShowTimingsByMovie")
+    public HashMap<Integer, List<Time>> theaterAndShowTimingsByMovie(
+            @RequestParam(name = "movieId") Integer movieId,
+            @RequestParam(name = "city") String city,
+            @RequestParam(name = "date") Date date
+    ) {
+        try 
+        {
+            System.out.println("Fetching theater and show timings for movie ID: " + movieId + " on date: " + date + " in city: " + city);
+            return showService.getTheaterAndShowTimingsByMovie(movieId, date, city); 
+        } catch (MovieDoesNotExists e) {
+            return null;
+        }
     }
 
     @GetMapping("/movieHavingMostShows")

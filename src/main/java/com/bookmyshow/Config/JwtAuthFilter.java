@@ -1,4 +1,4 @@
-package com.bookmyshow.Config;
+package com.bookmyshow.config;
 
 import com.bookmyshow.Services.JwtService;
 

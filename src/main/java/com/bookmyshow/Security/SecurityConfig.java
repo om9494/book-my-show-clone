@@ -14,8 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.bookmyshow.Config.JwtAuthFilter;
-import com.bookmyshow.Config.PasswordConfig;
+import com.bookmyshow.config.JwtAuthFilter;
+import com.bookmyshow.config.PasswordConfig;
 
 @Configuration
 @EnableWebSecurity
@@ -52,7 +52,7 @@ public class SecurityConfig {
                         // .requestMatchers("/movies/all", "/movies/id/**", "/movies/totalCollection/**").hasAnyRole("USER", "ADMIN") // Original, changed above
                         .requestMatchers("/movies/totalCollection/**").hasAnyRole("USER", "ADMIN") // Keep this restricted
                         .requestMatchers("/shows/getAllShows", "/shows/getShowById/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/shows/showTimingsOnDate", "/shows/movieHavingMostShows").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/shows/showTimingsOnDate", "/shows/theaterAndShowTimingsByMovie", "/shows/movieHavingMostShows").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/seats/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/bookings/**", "/ticket/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()

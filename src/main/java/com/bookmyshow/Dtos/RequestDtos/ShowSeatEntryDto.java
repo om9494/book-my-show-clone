@@ -6,5 +6,6 @@ import lombok.Data;
 public class ShowSeatEntryDto {
     private Integer showId;
     private Integer priceOfPremiumSeat;
+    private Integer priceOfClassicPlusSeat;
     private Integer priceOfClassicSeat;
 }

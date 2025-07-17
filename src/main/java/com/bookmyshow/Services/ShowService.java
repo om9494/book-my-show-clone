@@ -1,7 +1,9 @@
 package com.bookmyshow.Services;
 
 import java.sql.Time;
+import java.sql.Date;
 import java.util.List;
+import java.util.HashMap;
 
 import com.bookmyshow.Dtos.RequestDtos.ShowEntryDto;
 import com.bookmyshow.Dtos.RequestDtos.ShowSeatEntryDto;
@@ -23,5 +25,6 @@ public interface ShowService {
 	public List<Show> getAllShowByMovie(int movieId);
 	public String associateShowSeats(ShowSeatEntryDto showSeatEntryDto) throws ShowDoesNotExists;
 	public List<Time> showTimingsOnDate(ShowTimingsDto showTimingsDto);
+	public HashMap<Integer, List<Time>> getTheaterAndShowTimingsByMovie(Integer movieId, Date date, String city) throws MovieDoesNotExists, TheaterDoesNotExists;
 	public String movieHavingMostShows();
 }

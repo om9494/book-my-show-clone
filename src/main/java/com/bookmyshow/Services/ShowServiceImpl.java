@@ -1,8 +1,12 @@
 package com.bookmyshow.Services;
 
 import java.sql.Date;
+
 import java.sql.Time;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -118,19 +122,24 @@ public class ShowServiceImpl implements ShowService {
 		showSeatList.clear(); // Clear existing seats if any
 		System.out.println("Theater Seats: " + theaterSeats);
 		for (TheaterSeat theaterSeat : theaterSeats) {
-			ShowSeat showSeat = ShowSeat.builder()
-					.show(show)
-					.seatNo(theaterSeat.getSeatNo())
-					.seatType(theaterSeat.getSeatType())
-					.isAvailable(Boolean.TRUE)
-					.isFoodContains(Boolean.FALSE)
-					.price(
-							(theaterSeat.getSeatType().equals(SeatType.CLASSIC))
-									? showSeatEntryDto.getPriceOfClassicSeat()
-									: showSeatEntryDto.getPriceOfPremiumSeat())
-					.build();
-			// System.out.println("Show Seat: " + showSeat);
-			showSeatList.add(showSeat);
+			for(int i=1; i<=theaterSeat.getSeatCount(); i++){
+				String seatNo = theaterSeat.getRowLabel() + i;
+				ShowSeat showSeat = ShowSeat.builder()
+						.show(show)
+						.seatNo(seatNo)
+						.seatType(theaterSeat.getSeatType())
+						.isAvailable(Boolean.TRUE)
+						.isFoodContains(Boolean.FALSE)
+						.price(
+								(theaterSeat.getSeatType().equals(SeatType.CLASSIC))
+										? showSeatEntryDto.getPriceOfClassicSeat()
+										: (theaterSeat.getSeatType().equals(SeatType.CLASSICPLUS))
+												? showSeatEntryDto.getPriceOfClassicPlusSeat()
+												: showSeatEntryDto.getPriceOfPremiumSeat())
+						.build();
+				// System.out.println("Show Seat: " + showSeat);
+				showSeatList.add(showSeat);
+			}
 		}
 		// Save all show seats in the repository
 		showSeatRepository.saveAll(showSeatList);
@@ -148,6 +157,22 @@ public class ShowServiceImpl implements ShowService {
 		Integer movieId = showTimingsDto.getMovieId();
 		return showRepository.getShowTimingsOnDate(date, theaterId, movieId);
 	}
+
+	@Override
+	public HashMap<Integer, List<Time>> getTheaterAndShowTimingsByMovie(Integer movieId, Date date, String city) throws MovieDoesNotExists, TheaterDoesNotExists {
+			System.out.println("Internal Fetching theater and show timings for movie ID: " + movieId + " on date: " + date);
+			movieRepository.findById(movieId).orElseThrow(MovieDoesNotExists::new);
+			List<Theater> theaters = theatreRepository.findByCity(city);
+			if (theaters.isEmpty()) {
+				throw new TheaterDoesNotExists();
+			}
+			HashMap<Integer, List<Time>> theaterShowTimingsMap = new HashMap<>();
+			for (Theater theater : theaters) {
+				List<Time> showTimings = showRepository.getShowTimingsOnDate(date, theater.getId(), movieId);
+				theaterShowTimingsMap.put(theater.getId(), showTimings);
+			}
+			return theaterShowTimingsMap;
+		}
 
 	@Override
 	public String movieHavingMostShows() {
