@@ -34,6 +34,16 @@ public class TheaterController {
         return ResponseEntity.ok(theaters);
     }
 
+    @GetMapping("/id/{id}")
+    public ResponseEntity<Theater> getTheatreById(@PathVariable int id){
+        try{Theater theater = theatreService.getTheatreById(id);
+        return ResponseEntity.ok(theater);
+        }
+        catch(Exception e){
+            return null;
+        }
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<String> updateTheatre(@PathVariable int id, @RequestBody TheatreDto theatreDto) {
         String result = theatreService.updateTheatre(id, theatreDto);
