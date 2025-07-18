@@ -4,6 +4,9 @@ package com.bookmyshow.Controllers;
 import com.bookmyshow.Dtos.RequestDtos.TicketEntryDto;
 import com.bookmyshow.Dtos.ResponseDtos.TicketResponseDto;
 import com.bookmyshow.Services.TicketService;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +19,22 @@ public class TicketController {
     @Autowired
     private TicketService ticketService;
 
+    @GetMapping("/user/{userId}/all")
+    public ResponseEntity<List<TicketResponseDto>> getTicketsByUserId(@PathVariable Integer userId) {
+        List<TicketResponseDto> tickets = ticketService.getAllTicketsByUserId(userId);
+        return new ResponseEntity<>(tickets, HttpStatus.OK);
+    }
+
+    @GetMapping("/user/{userId}/active")
+    public ResponseEntity<List<TicketResponseDto>> getActiveTicketsByUserId(@PathVariable Integer userId) {
+        List<TicketResponseDto> tickets = ticketService.getActiveTicketsByUserId(userId);
+        return new ResponseEntity<>(tickets, HttpStatus.OK);
+    }
+
     @PostMapping("/book")
-    public ResponseEntity<TicketResponseDto> ticketBooking(@RequestBody TicketEntryDto ticketEntryDto) {
+    public ResponseEntity<List<TicketResponseDto>> ticketBooking(@RequestBody TicketEntryDto ticketEntryDto) {
         // Let exceptions bubble up to GlobalExceptionHandler
-        TicketResponseDto result = ticketService.ticketBooking(ticketEntryDto);
+        List<TicketResponseDto> result = ticketService.ticketBooking(ticketEntryDto);
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 }

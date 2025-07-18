@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 // import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +39,34 @@ public class TicketService {
     // @Autowired
     // private JavaMailSender mailSender;
 
-    public TicketResponseDto ticketBooking(TicketEntryDto ticketEntryDto) throws RequestedSeatAreNotAvailable, UserDoesNotExist, ShowDoesNotExists{
+    public List<TicketResponseDto> getAllTicketsByUserId(Integer userId) throws UserDoesNotExist {
+        userRepository.findById(userId).orElseThrow(UserDoesNotExist::new);
+        List<Ticket> tickets = ticketRepository.findByUserId(userId);
+        List<TicketResponseDto> ticketResponseDtos = new ArrayList<>();
+        for(Ticket ticket : tickets) {
+            Show show = ticket.getShow();
+            ticketResponseDtos.add(TicketTransformer.returnTicket(show, ticket));
+        }
+        return ticketResponseDtos;
+    }
+
+    public List<TicketResponseDto> getActiveTicketsByUserId(Integer userId) throws UserDoesNotExist {
+        userRepository.findById(userId).orElseThrow(UserDoesNotExist::new);
+        //todays date in YYYY-MM-DD
+        Date today = new Date(System.currentTimeMillis());
+        System.out.println(today);
+        List<Ticket> tickets = ticketRepository.findActiveTicketsByUserId(userId, today);
+        List<TicketResponseDto> ticketResponseDtos = new ArrayList<>();
+        for(Ticket ticket : tickets){
+            Show show = ticket.getShow();
+            ticketResponseDtos.add(TicketTransformer.returnTicket(show, ticket));
+        }
+        return ticketResponseDtos;
+    }
+
+
+
+    public List<TicketResponseDto> ticketBooking(TicketEntryDto ticketEntryDto) throws RequestedSeatAreNotAvailable, UserDoesNotExist, ShowDoesNotExists{
         // check show present
         Optional<Show> showOpt = showRepository.findById(ticketEntryDto.getShowId());
         if(showOpt.isEmpty()) {
@@ -54,44 +83,48 @@ public class TicketService {
         Show show = showOpt.get();
 
         List<String> requestedSeats = ticketEntryDto.getRequestSeats();
-        if (requestedSeats == null || requestedSeats.size() != 1) {
-            throw new RequestedSeatAreNotAvailable("Seat " + requestedSeats + " is already booked."); // Only one seat per ticket as per model
+        if (requestedSeats == null || requestedSeats.size() < 1) {
+            throw new RequestedSeatAreNotAvailable("No Seat Requested!"); // Only one seat per ticket as per model
         }
-        String requestedSeatNo = requestedSeats.get(0);
+        List<TicketResponseDto> tickets = new ArrayList<>();
+        for(String seatno : requestedSeats){
+            String requestedSeatNo = seatno;
 
-        List<ShowSeat> showSeatList = showSeatRepository.findByShowId(show.getShowId());
-        ShowSeat bookedSeat = null;
-        for (ShowSeat seat : showSeatList) {
-            if (seat.getSeatNo().equals(requestedSeatNo)) {
-                if (!seat.getIsAvailable()) {
-                    throw new RequestedSeatAreNotAvailable("Seat " + requestedSeatNo + " is already booked.");
+            List<ShowSeat> showSeatList = showSeatRepository.findByShowId(show.getShowId());
+            ShowSeat bookedSeat = null;
+            for (ShowSeat seat : showSeatList) {
+                if (seat.getSeatNo().equals(requestedSeatNo)) {
+                    if (!seat.getIsAvailable()) {
+                        throw new RequestedSeatAreNotAvailable("Seat " + seatno + " is already booked.");
+                    }
+                    bookedSeat = seat;
+                    break;
                 }
-                bookedSeat = seat;
-                break;
             }
+            if (bookedSeat == null) {
+                throw new RequestedSeatAreNotAvailable();
+            }
+
+            // Mark seat as unavailable and calculate price
+            bookedSeat.setIsAvailable(Boolean.FALSE);
+            Integer ticketPrice = bookedSeat.getPrice();
+
+            // create ticket entity and set all attribute
+            Ticket ticket = new Ticket();
+            ticket.setTicketPrice(ticketPrice);
+            ticket.setShowSeat(bookedSeat);
+            ticket.setUser(user);
+            ticket.setShow(show);
+
+            // Save entities
+            showSeatRepository.save(bookedSeat);
+            ticket = ticketRepository.save(ticket);
+            userRepository.save(user);
+            showRepository.save(show);
+            tickets.add(TicketTransformer.returnTicket(show, ticket));
         }
-        if (bookedSeat == null) {
-            throw new RequestedSeatAreNotAvailable();
-        }
 
-        // Mark seat as unavailable and calculate price
-        bookedSeat.setIsAvailable(Boolean.FALSE);
-        Integer ticketPrice = bookedSeat.getPrice();
-
-        // create ticket entity and set all attribute
-        Ticket ticket = new Ticket();
-        ticket.setTicketPrice(ticketPrice);
-        ticket.setShowSeat(bookedSeat);
-        ticket.setUser(user);
-        ticket.setShow(show);
-
-        // Save entities
-        showSeatRepository.save(bookedSeat);
-        ticket = ticketRepository.save(ticket);
-        userRepository.save(user);
-        showRepository.save(show);
-
-        return TicketTransformer.returnTicket(show, ticket);
+        return tickets;
     }
 
     private Boolean isSeatAvailable(List<ShowSeat> showSeatList, List<String> requestSeats) {
