@@ -28,7 +28,7 @@ public class Show {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer showId;
 	
-	@CreationTimestamp
+	
 	private Time time;
 	
 	private Date date;
