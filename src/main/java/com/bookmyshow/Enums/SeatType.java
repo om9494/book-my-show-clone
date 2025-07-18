@@ -2,5 +2,6 @@ package com.bookmyshow.Enums;
 
 public enum SeatType {
     CLASSIC,
-    PREMIUM
+    PREMIUM,
+    CLASSICPLUS
 }

@@ -59,7 +59,7 @@ public class SecurityConfig {
 
                         .requestMatchers("/movies/totalCollection/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/shows/getAllShows", "/shows/getShowById/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/shows/showTimingsOnDate", "/shows/movieHavingMostShows").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/shows/showTimingsOnDate", "/shows/theaterAndShowTimingsByMovie", "/shows/movieHavingMostShows").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/seats/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/bookings/**", "/ticket/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()

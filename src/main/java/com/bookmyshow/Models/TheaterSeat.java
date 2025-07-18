@@ -19,7 +19,8 @@ public class TheaterSeat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private String seatNo;
+    private String rowLabel;
+    private Integer seatCount;
 
     @Enumerated(value = EnumType.STRING)
     private SeatType seatType;

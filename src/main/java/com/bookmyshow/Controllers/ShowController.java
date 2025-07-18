@@ -2,16 +2,20 @@ package com.bookmyshow.Controllers;
 
 import com.bookmyshow.Dtos.RequestDtos.ShowEntryDto;
 import com.bookmyshow.Dtos.RequestDtos.ShowSeatEntryDto;
+import com.bookmyshow.Dtos.RequestDtos.ShowTimingsAllTheaterDto; // Make sure this DTO exists if used
 import com.bookmyshow.Dtos.RequestDtos.ShowTimingsDto;
+import com.bookmyshow.Exceptions.MovieDoesNotExists;
 import com.bookmyshow.Models.Show;
 import com.bookmyshow.Services.ShowService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus; // Import HttpStatus
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException; // Import ResponseStatusException
+import org.springframework.web.server.ResponseStatusException;
 
+import java.sql.Date;
 import java.sql.Time;
 import java.util.List;
+import java.util.HashMap; // Keep this import for HashMap
 
 @RestController
 @RequestMapping("/shows")
@@ -30,10 +34,8 @@ public class ShowController {
         try {
             return showService.getShowById(id);
         } catch (Exception e) {
-            // Log the exception for debugging purposes on the server side
             System.err.println("Error fetching show by ID: " + e.getMessage());
             e.printStackTrace();
-            // Re-throw as a ResponseStatusException for proper HTTP error response
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
     }
@@ -44,10 +46,8 @@ public class ShowController {
             String res = showService.addShow(showEntryDto);
             return res;
         } catch (Exception e) {
-            // Log the exception for debugging purposes on the server side
             System.err.println("Error adding show: " + e.getMessage());
-            e.printStackTrace(); // This will print the full stack trace to your backend console
-            // Re-throw as a ResponseStatusException to ensure a proper 500 error with details
+            e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to add show: " + e.getMessage(), e);
         }
     }
@@ -90,13 +90,38 @@ public class ShowController {
 
     @GetMapping("/showTimingsOnDate")
     public List<Time> showTimingsOnDate(@RequestBody ShowTimingsDto showTimingsDto) {
-        // This method does not throw checked exceptions, so no try-catch needed here
+        System.out.println("Fetching show timings for date: " + showTimingsDto.getDate() +
+                           ", theaterId: " + showTimingsDto.getTheaterId() +
+                           ", movieId: " + showTimingsDto.getMovieId());
         return showService.showTimingsOnDate(showTimingsDto);
+    }
+
+    @GetMapping("/theaterAndShowTimingsByMovie")
+    public HashMap<Integer, List<Time>> theaterAndShowTimingsByMovie(
+            @RequestParam(name = "movieId") Integer movieId,
+            @RequestParam(name = "city") String city,
+            @RequestParam(name = "date") Date date
+    ) {
+        try
+        {
+            System.out.println("Fetching theater and show timings for movie ID: " + movieId + " on date: " + date + " in city: " + city);
+            return showService.getTheaterAndShowTimingsByMovie(movieId, date, city);
+        } catch (MovieDoesNotExists e) {
+            // Log the exception for debugging purposes on the server side
+            System.err.println("Error in theaterAndShowTimingsByMovie: Movie does not exist. " + e.getMessage());
+            e.printStackTrace();
+            // Return an empty HashMap or throw a more specific HTTP error if preferred
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Movie not found: " + e.getMessage(), e);
+        } catch (Exception e) {
+            // Catch any other unexpected exceptions
+            System.err.println("An unexpected error occurred in theaterAndShowTimingsByMovie: " + e.getMessage());
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred: " + e.getMessage(), e);
+        }
     }
 
     @GetMapping("/movieHavingMostShows")
     public String movieHavingMostShows() {
-        // This method does not throw checked exceptions, so no try-catch needed here
         return showService.movieHavingMostShows();
     }
 }

@@ -11,7 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TheaterSeatEntryDto {
-    private String seatNo;
+    private String rowLabel;
+    private Integer seatCount;
     private SeatType seatType;
     private Integer theaterId;
 }

@@ -1,17 +1,21 @@
 package com.bookmyshow.Services;
 
 import java.sql.Date;
+
 import java.sql.Time;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map; // Although Map is not directly used in the provided methods, it's a common utility for HashMaps
+import java.util.ArrayList; // Used for showSeatList initialization if it were a new list, but here it's for general utility.
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // Import for transactional annotation
+import org.springframework.transaction.annotation.Transactional;
 
 import com.bookmyshow.Dtos.RequestDtos.ShowEntryDto;
 import com.bookmyshow.Dtos.RequestDtos.ShowSeatEntryDto;
 import com.bookmyshow.Dtos.RequestDtos.ShowTimingsDto;
-import com.bookmyshow.Enums.SeatType;
+import com.bookmyshow.Enums.SeatType; // Ensure SeatType enum includes CLASSIC, CLASSICPLUS, PREMIUM
 import com.bookmyshow.Exceptions.MovieDoesNotExists;
 import com.bookmyshow.Exceptions.ShowDoesNotExists;
 import com.bookmyshow.Exceptions.TheaterDoesNotExists;
@@ -19,12 +23,12 @@ import com.bookmyshow.Models.Movie;
 import com.bookmyshow.Models.Show;
 import com.bookmyshow.Models.ShowSeat;
 import com.bookmyshow.Models.Theater;
-import com.bookmyshow.Models.TheaterSeat;
+import com.bookmyshow.Models.TheaterSeat; // Ensure TheaterSeat has getRowLabel() and getSeatCount()
 import com.bookmyshow.Repositories.MovieRepository;
 import com.bookmyshow.Repositories.ShowRepository;
 import com.bookmyshow.Repositories.ShowSeatRepository;
 import com.bookmyshow.Repositories.TheaterSeatRepository;
-import com.bookmyshow.Repositories.TheatreRepository;
+import com.bookmyshow.Repositories.TheatreRepository; // Ensure TheatreRepository has findByCity(String city)
 
 @Service
 public class ShowServiceImpl implements ShowService {
@@ -150,32 +154,30 @@ public class ShowServiceImpl implements ShowService {
 		if (!showSeatList.isEmpty()) {
 			return "Show seats have already been associated for this show.";
 		}
-		// It's generally not recommended to clear and re-add if you are checking for emptiness.
-		// If the intent is to ensure a fresh list, this is fine, but if it's for updates,
-		// you might need a different approach.
-		// showSeatList.clear(); // This line is effectively redundant if the list is already empty based on the above check.
 		
 		System.out.println("Theater Seats: " + theaterSeats);
+		// Resolved merge conflict: Using the logic that iterates based on seatCount and generates seat numbers
 		for (TheaterSeat theaterSeat : theaterSeats) {
-			ShowSeat showSeat = ShowSeat.builder()
-					.show(show)
-					.seatNo(theaterSeat.getSeatNo())
-					.seatType(theaterSeat.getSeatType())
-					.isAvailable(Boolean.TRUE)
-					.isFoodContains(Boolean.FALSE)
-					.price(
-							(theaterSeat.getSeatType().equals(SeatType.CLASSIC))
-									? showSeatEntryDto.getPriceOfClassicSeat()
-									: showSeatEntryDto.getPriceOfPremiumSeat())
-					.build();
-			showSeatList.add(showSeat);
+			for(int i=1; i<=theaterSeat.getSeatCount(); i++){
+				String seatNo = theaterSeat.getRowLabel() + i; // Assumes TheaterSeat has getRowLabel()
+				ShowSeat showSeat = ShowSeat.builder()
+						.show(show)
+						.seatNo(seatNo)
+						.seatType(theaterSeat.getSeatType())
+						.isAvailable(Boolean.TRUE)
+						.isFoodContains(Boolean.FALSE)
+						.price(
+								(theaterSeat.getSeatType().equals(SeatType.CLASSIC))
+										? showSeatEntryDto.getPriceOfClassicSeat()
+										: (theaterSeat.getSeatType().equals(SeatType.CLASSICPLUS)) // Assumes SeatType.CLASSICPLUS exists
+												? showSeatEntryDto.getPriceOfClassicPlusSeat() // Assumes ShowSeatEntryDto has getPriceOfClassicPlusSeat()
+												: showSeatEntryDto.getPriceOfPremiumSeat())
+						.build();
+				showSeatList.add(showSeat);
+			}
 		}
 		// Save all show seats in the repository
 		showSeatRepository.saveAll(showSeatList);
-		// Associate the show seats with the show (already done by setting show in ShowSeat,
-		// and show is already managed by JPA if it was fetched. This save might be redundant
-		// unless you are updating fields on the 'show' object itself.)
-		// showRepository.save(show); // This line might be redundant if no changes were made to the 'show' object itself.
 		
 		return "Show seats have been associated successfully!";
 	}
@@ -187,6 +189,25 @@ public class ShowServiceImpl implements ShowService {
 		Integer movieId = showTimingsDto.getMovieId();
 		return showRepository.getShowTimingsOnDate(date, theaterId, movieId);
 	}
+
+	@Override
+	public HashMap<Integer, List<Time>> getTheaterAndShowTimingsByMovie(Integer movieId, Date date, String city)
+            throws MovieDoesNotExists, TheaterDoesNotExists { // Added TheaterDoesNotExists to throws clause
+			System.out.println("Internal Fetching theater and show timings for movie ID: " + movieId + " on date: " + date);
+			movieRepository.findById(movieId).orElseThrow(MovieDoesNotExists::new);
+			
+            // Assumes theatreRepository has a findByCity method
+			List<Theater> theaters = theatreRepository.findByCity(city);
+			if (theaters.isEmpty()) {
+				throw new TheaterDoesNotExists(); // Throw exception if no theaters found in the city
+			}
+			HashMap<Integer, List<Time>> theaterShowTimingsMap = new HashMap<>();
+			for (Theater theater : theaters) {
+				List<Time> showTimings = showRepository.getShowTimingsOnDate(date, theater.getId(), movieId);
+				theaterShowTimingsMap.put(theater.getId(), showTimings);
+			}
+			return theaterShowTimingsMap;
+		}
 
 	@Override
 	public String movieHavingMostShows() {
