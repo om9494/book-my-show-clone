@@ -48,7 +48,7 @@ public class SecurityConfig {
                         .requestMatchers("/theater-seats/addTheaterSeat", "/theater-seats/updateTheaterSeat/**", "/theater-seats/deleteTheaterSeat/**").hasRole("ADMIN")
                         .requestMatchers("/theaters/getAllTheaters", "/theaters/getTheaterById/**", "/theaters/getTheaterByCity/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/theater-seats/getSeatsByTheater/**").hasAnyRole("USER", "ADMIN")
-
+                        .requestMatchers("/mysql/query").hasAnyRole("USER", "ADMIN")
                         // .requestMatchers("/movies/all", "/movies/id/**", "/movies/totalCollection/**").hasAnyRole("USER", "ADMIN") // Original, changed above
                         .requestMatchers("/movies/totalCollection/**").hasAnyRole("USER", "ADMIN") // Keep this restricted
                         .requestMatchers("/shows/getAllShows", "/shows/getShowById/**").hasAnyRole("USER", "ADMIN")
