@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +35,8 @@ import com.bookmyshow.Repositories.TheatreRepository;
 @Service
 public class ShowServiceImpl implements ShowService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ShowServiceImpl.class);
+
     @Autowired
     private ShowRepository showRepository;
 
@@ -51,7 +55,7 @@ public class ShowServiceImpl implements ShowService {
     @Override
     @Transactional
     public String addShow(ShowEntryDto showEntryDto) throws MovieDoesNotExists, TheaterDoesNotExists {
-        System.out.println("Attempting to add show with DTO: " + showEntryDto);
+        logger.info("Attempting to add show with DTO: {}", showEntryDto);
 
         Show show = new Show();
         show.setDate(showEntryDto.getDate());
@@ -59,13 +63,13 @@ public class ShowServiceImpl implements ShowService {
 
         Movie movie = movieRepository.findById(showEntryDto.getMovieId())
                 .orElseThrow(() -> {
-                    System.err.println("Movie with ID " + showEntryDto.getMovieId() + " not found.");
+                    logger.error("Movie with ID {} not found.", showEntryDto.getMovieId());
                     return new MovieDoesNotExists();
                 });
 
         Theater theater = theatreRepository.findById(showEntryDto.getTheaterId())
                 .orElseThrow(() -> {
-                    System.err.println("Theater with ID " + showEntryDto.getTheaterId() + " not found.");
+                    logger.error("Theater with ID {} not found.", showEntryDto.getTheaterId());
                     return new TheaterDoesNotExists();
                 });
 
@@ -74,11 +78,10 @@ public class ShowServiceImpl implements ShowService {
 
         try {
             show = showRepository.save(show);
-            System.out.println("Show saved successfully with ID: " + show.getShowId());
+            logger.info("Show saved successfully with ID: {}", show.getShowId());
             return "Show: " + show.getShowId() + " Added Successfully!";
         } catch (Exception e) {
-            System.err.println("Error saving show: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error saving show: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to add show due to an internal error.", e);
         }
     }
@@ -87,26 +90,37 @@ public class ShowServiceImpl implements ShowService {
     @Transactional
     public String updateShow(int id, ShowEntryDto showEntryDto)
             throws ShowDoesNotExists, MovieDoesNotExists, TheaterDoesNotExists {
-        Show show = showRepository.findById(id).orElseThrow(ShowDoesNotExists::new);
+        logger.info("Attempting to update show with ID {} using DTO: {}", id, showEntryDto);
+        Show show = showRepository.findById(id)
+                .orElseThrow(() -> {
+                    logger.error("Show with ID {} not found for update.", id);
+                    return new ShowDoesNotExists();
+                });
 
         show.setDate(showEntryDto.getDate());
         show.setTime(showEntryDto.getTime());
 
         Movie movie = movieRepository.findById(showEntryDto.getMovieId())
-                .orElseThrow(MovieDoesNotExists::new);
+                .orElseThrow(() -> {
+                    logger.error("Movie with ID {} not found for show update.", showEntryDto.getMovieId());
+                    return new MovieDoesNotExists();
+                });
 
         Theater theater = theatreRepository.findById(showEntryDto.getTheaterId())
-                .orElseThrow(TheaterDoesNotExists::new);
+                .orElseThrow(() -> {
+                    logger.error("Theater with ID {} not found for show update.", showEntryDto.getTheaterId());
+                    return new TheaterDoesNotExists();
+                });
 
         show.setMovie(movie);
         show.setTheatre(theater);
 
         try {
             show = showRepository.save(show);
+            logger.info("Show with ID {} updated successfully.", show.getShowId());
             return "Show: " + show.getShowId() + " is Updated Successfully!";
         } catch (Exception e) {
-            System.err.println("Error updating show: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error updating show with ID {}: {}", id, e.getMessage(), e);
             throw new RuntimeException("Failed to update show due to an internal error.", e);
         }
     }
@@ -114,13 +128,17 @@ public class ShowServiceImpl implements ShowService {
     @Override
     @Transactional
     public String deleteShow(int id) throws ShowDoesNotExists {
-        showRepository.findById(id).orElseThrow(ShowDoesNotExists::new);
+        logger.info("Attempting to delete show with ID: {}", id);
+        showRepository.findById(id).orElseThrow(() -> {
+            logger.error("Show with ID {} not found for deletion.", id);
+            return new ShowDoesNotExists();
+        });
         try {
             showRepository.deleteById(id);
+            logger.info("Show with ID {} deleted successfully.", id);
             return "Show: " + id + " is Deleted Successfully!";
         } catch (Exception e) {
-            System.err.println("Error deleting show: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error deleting show with ID {}: {}", id, e.getMessage(), e);
             throw new RuntimeException("Failed to delete show due to an internal error.", e);
         }
     }
@@ -128,18 +146,24 @@ public class ShowServiceImpl implements ShowService {
     @Override
     @Transactional
     public String associateShowSeats(ShowSeatEntryDto showSeatEntryDto) throws ShowDoesNotExists {
+        logger.info("Attempting to associate seats for show ID: {}", showSeatEntryDto.getShowId());
         Show show = showRepository.findById(showSeatEntryDto.getShowId())
-                .orElseThrow(ShowDoesNotExists::new);
+                .orElseThrow(() -> {
+                    logger.error("Show with ID {} not found for seat association.", showSeatEntryDto.getShowId());
+                    return new ShowDoesNotExists();
+                });
 
         Theater theater = show.getTheatre();
         List<TheaterSeat> theaterSeats = theaterSeatRepository.findAllByTheaterId(theater.getId());
 
         if (theaterSeats.isEmpty()) {
+            logger.warn("No seats available in theater ID {} for show ID {}. Aborting seat association.", theater.getId(), show.getShowId());
             return "No seats available in the theater.";
         }
 
         List<ShowSeat> showSeatList = showSeatRepository.findByShowId(show.getShowId());
         if (!showSeatList.isEmpty()) {
+            logger.warn("Show seats already associated for show ID {}. Aborting association.", show.getShowId());
             return "Show seats have already been associated for this show.";
         }
 
@@ -164,25 +188,36 @@ public class ShowServiceImpl implements ShowService {
         }
 
         showSeatRepository.saveAll(showSeatList);
+        logger.info("Successfully associated {} seats for show ID {}.", showSeatList.size(), show.getShowId());
         return "Show seats have been associated successfully!";
     }
 
     @Override
     public List<Time> showTimingsOnDate(ShowTimingsDto showTimingsDto) {
+        logger.info("Fetching show timings for movie ID: {}, theater ID: {}, and date: {}", showTimingsDto.getMovieId(), showTimingsDto.getTheaterId(), showTimingsDto.getDate());
         Date date = showTimingsDto.getDate();
         Integer theaterId = showTimingsDto.getTheaterId();
         Integer movieId = showTimingsDto.getMovieId();
-        return showRepository.getShowTimingsOnDate(date, theaterId, movieId);
+        List<Time> timings = showRepository.getShowTimingsOnDate(date, theaterId, movieId);
+        logger.debug("Found {} timings for the specified criteria.", timings.size());
+        return timings;
     }
 
     @Override
     public HashMap<Integer, HashMap<Integer, Time>> getTheaterAndShowTimingsByMovie(Integer movieId, Date date, String city)
             throws MovieDoesNotExists, TheaterDoesNotExists {
-        movieRepository.findById(movieId).orElseThrow(MovieDoesNotExists::new);
+        logger.info("Fetching theater and show timings for movie ID: {} on date: {} in city: {}", movieId, date, city);
+        movieRepository.findById(movieId)
+                .orElseThrow(() -> {
+                    logger.error("Movie with ID {} not found.", movieId);
+                    return new MovieDoesNotExists();
+                });
         List<Theater> theaters = theatreRepository.findByCity(city);
         if (theaters.isEmpty()) {
+            logger.error("No theaters found in the specified city: {}", city);
             throw new TheaterDoesNotExists();
         }
+        logger.debug("Found {} theaters in city {}.", theaters.size(), city);
 
         HashMap<Integer, HashMap<Integer, Time>> theaterShowTimingsMap = new HashMap<>();
         for (Theater theater : theaters) {
@@ -193,56 +228,96 @@ public class ShowServiceImpl implements ShowService {
                     showTimings.put(show.getShowId(), show.getTime());
                 }
             }
-            theaterShowTimingsMap.put(theater.getId(), showTimings);
+            if (!showTimings.isEmpty()) {
+                logger.debug("Found {} shows for theater ID {} on the given date.", showTimings.size(), theater.getId());
+                theaterShowTimingsMap.put(theater.getId(), showTimings);
+            } else {
+                logger.debug("No shows found for theater ID {} on the given date.", theater.getId());
+            }
         }
 
+        logger.info("Finished fetching theater and show timings. Total theaters with shows: {}", theaterShowTimingsMap.size());
         return theaterShowTimingsMap;
     }
 
     @Override
     public String movieHavingMostShows() {
+        logger.info("Fetching movie with the most shows.");
         Integer movieId = showRepository.getMostShowsMovieId();
         if (movieId == null) {
+            logger.info("No shows are available at the moment.");
             return "No shows are available at the moment.";
         }
-        return movieRepository.findById(movieId)
+        String movieName = movieRepository.findById(movieId)
                 .map(Movie::getMovieName)
-                .orElse("Movie not found, but was associated with the most shows.");
+                .orElseGet(() -> {
+                    logger.warn("Movie with ID {} not found, but was associated with the most shows.", movieId);
+                    return "Movie not found, but was associated with the most shows.";
+                });
+        logger.info("Movie with most shows is: {}", movieName);
+        return movieName;
     }
 
     @Override
     public List<Show> getAllShows() {
-        return showRepository.findAll();
+        logger.info("Fetching all shows.");
+        List<Show> shows = showRepository.findAll();
+        logger.debug("Found {} shows.", shows.size());
+        return shows;
     }
 
     @Override
     public Show getShowById(int id) throws ShowDoesNotExists {
-        return showRepository.findById(id).orElseThrow(ShowDoesNotExists::new);
+        logger.info("Fetching show with ID: {}", id);
+        return showRepository.findById(id).orElseThrow(() -> {
+            logger.error("Show with ID {} not found.", id);
+            return new ShowDoesNotExists();
+        });
     }
 
     @Override
     public List<Show> getShowByMovieAndTheater(int movieId, int theaterId)
             throws MovieDoesNotExists, TheaterDoesNotExists {
-        movieRepository.findById(movieId).orElseThrow(MovieDoesNotExists::new);
-        theatreRepository.findById(theaterId).orElseThrow(TheaterDoesNotExists::new);
-        return showRepository.getAllShowsOfMovieInTheater(movieId, theaterId);
+        logger.info("Fetching shows for movie ID: {} and theater ID: {}", movieId, theaterId);
+        movieRepository.findById(movieId).orElseThrow(() -> {
+            logger.error("Movie with ID {} not found.", movieId);
+            return new MovieDoesNotExists();
+        });
+        theatreRepository.findById(theaterId).orElseThrow(() -> {
+            logger.error("Theater with ID {} not found.", theaterId);
+            return new TheaterDoesNotExists();
+        });
+        List<Show> shows = showRepository.getAllShowsOfMovieInTheater(movieId, theaterId);
+        logger.debug("Found {} shows for movie ID {} and theater ID {}.", shows.size(), movieId, theaterId);
+        return shows;
     }
 
     @Override
     public List<Show> getAllShowByMovie(int movieId) {
-        movieRepository.findById(movieId).orElseThrow(MovieDoesNotExists::new);
-        return showRepository.getAllShowsOfMovie(movieId);
+        logger.info("Fetching all shows for movie ID: {}", movieId);
+        movieRepository.findById(movieId).orElseThrow(() -> {
+            logger.error("Movie with ID {} not found.", movieId);
+            return new MovieDoesNotExists();
+        });
+        List<Show> shows = showRepository.getAllShowsOfMovie(movieId);
+        logger.debug("Found {} shows for movie ID {}.", shows.size(), movieId);
+        return shows;
     }
 
     @Override
     public HashMap<String, Integer> getSeatsPrices(Integer showId) throws ShowDoesNotExists {
-        Show show = showRepository.findById(showId).orElseThrow(ShowDoesNotExists::new);
+        logger.info("Fetching seat prices for show ID: {}", showId);
+        Show show = showRepository.findById(showId).orElseThrow(() -> {
+            logger.error("Show with ID {} not found.", showId);
+            return new ShowDoesNotExists();
+        });
         List<SeatPrice> seatPricesList = showSeatRepository.getSeatsPrices(show.getShowId());
 
         HashMap<String, Integer> seatPrices = new HashMap<>();
         for (SeatPrice seatPrice : seatPricesList) {
             seatPrices.put(seatPrice.getSeatType(), seatPrice.getPrice());
         }
+        logger.debug("Found prices for {} seat types for show ID {}.", seatPrices.size(), showId);
 
         return seatPrices;
     }
