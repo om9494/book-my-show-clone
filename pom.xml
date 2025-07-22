@@ -50,6 +50,8 @@
 		    <scope>runtime</scope>
          </dependency>
          
+         
+         
         <!-- REMOVED: Explicit slf4j-api and logback-classic dependencies.
                      These are provided transitively and managed by spring-boot-starter-parent
                      and spring-boot-starter-logging (included in web/jpa starters).

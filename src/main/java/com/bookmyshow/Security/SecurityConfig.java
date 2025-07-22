@@ -49,6 +49,8 @@ public class SecurityConfig {
                         .requestMatchers("/theaters/getAllTheaters", "/theaters/getTheaterById/**", "/theaters/getTheaterByCity/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/theater-seats/getSeatsByTheater/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/mysql/query").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/reviews/movie/**").permitAll() // Anyone can view reviews
+                        .requestMatchers("/reviews/**").authenticated()
                         // .requestMatchers("/movies/all", "/movies/id/**", "/movies/totalCollection/**").hasAnyRole("USER", "ADMIN") // Original, changed above
                         .requestMatchers("/movies/totalCollection/**").hasAnyRole("USER", "ADMIN") // Keep this restricted
                         .requestMatchers("/shows/getAllShows", "/shows/getShowById/**").hasAnyRole("USER", "ADMIN")
