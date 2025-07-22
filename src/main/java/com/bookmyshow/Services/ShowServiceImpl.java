@@ -260,7 +260,7 @@ public class ShowServiceImpl implements ShowService {
 
     @Override
     public List<Show> getAllShows() {
-        logger.info("Fetching all shows.");
+        logger.info("Fetching all recent shows.");
         List<Show> shows = showRepository.findAll();
         logger.debug("Found {} shows.", shows.size());
         return shows;
@@ -287,7 +287,14 @@ public class ShowServiceImpl implements ShowService {
             logger.error("Theater with ID {} not found.", theaterId);
             return new TheaterDoesNotExists();
         });
+        Time currentTime = new Time(System.currentTimeMillis());
+        Date currentDate = new Date(System.currentTimeMillis());
         List<Show> shows = showRepository.getAllShowsOfMovieInTheater(movieId, theaterId);
+        for(Show show : shows){
+            if (show.getDate().before(currentDate) || (show.getDate().equals(currentDate) && show.getTime().before(currentTime))){
+                shows.remove(show);
+            }
+        }
         logger.debug("Found {} shows for movie ID {} and theater ID {}.", shows.size(), movieId, theaterId);
         return shows;
     }
