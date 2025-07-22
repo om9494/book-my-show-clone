@@ -50,6 +50,8 @@ public class SecurityConfig {
                         .requestMatchers("/shows/showTimingsOnDate", "/shows/theaterAndShowTimingsByMovie", "/shows/movieHavingMostShows").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/seats/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/bookings/**", "/ticket/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/reviews/movie/**").permitAll() // Anyone can view reviews
+                        .requestMatchers("/reviews/**").authenticated()
 
                         // --- NEW RULE FOR PAYMENT ---
                         // This secures the Razorpay payment endpoints.
