@@ -2,12 +2,15 @@ package com.bookmyshow.Services;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
 import com.bookmyshow.Dtos.RequestDtos.TheatreDto;
 import com.bookmyshow.Exceptions.TheaterDoesNotExists;
 import com.bookmyshow.Models.Theater;
 import com.bookmyshow.Repositories.TheatreRepository;
+import com.bookmyshow.Transformers.TheaterTransformer;
+
 
 import java.util.List;
 
@@ -19,12 +22,9 @@ public class TheatreServiceImpl implements TheatreService {
 
     @Override
     public String addTheatre(TheatreDto dto) {
-        Theater theatre = new Theater();
-        theatre.setName(dto.getName());
-        theatre.setCity(dto.getCity());
-        theatre.setNumberOfScreens(dto.getNumberOfScreens());
+        // Use the transformer to create the Theater object
+        Theater theatre = TheaterTransformer.theaterDtoToTheater(dto); 
         theatreRepository.save(theatre);
-        //theatre is now saved in the db
         return "Theatre added successfully!";
     }
 
