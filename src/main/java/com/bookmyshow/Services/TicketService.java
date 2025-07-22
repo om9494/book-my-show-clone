@@ -12,8 +12,6 @@ import com.bookmyshow.Models.User;
 import com.bookmyshow.Repositories.*;
 import com.bookmyshow.Transformers.TicketTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.mail.SimpleMailMessage;
-// import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
@@ -36,8 +34,9 @@ public class TicketService {
     @Autowired
     private ShowSeatRepository showSeatRepository;
 
-    // @Autowired
-    // private JavaMailSender mailSender;
+    // --- CHANGE 1: Inject the EmailService ---
+    @Autowired
+    private EmailService emailService;
 
     public List<TicketResponseDto> getAllTicketsByUserId(Integer userId) throws UserDoesNotExist {
         userRepository.findById(userId).orElseThrow(UserDoesNotExist::new);
@@ -52,7 +51,6 @@ public class TicketService {
 
     public List<TicketResponseDto> getActiveTicketsByUserId(Integer userId) throws UserDoesNotExist {
         userRepository.findById(userId).orElseThrow(UserDoesNotExist::new);
-        //todays date in YYYY-MM-DD
         Date today = new Date(System.currentTimeMillis());
         System.out.println(today);
         List<Ticket> tickets = ticketRepository.findActiveTicketsByUserId(userId, today);
@@ -63,8 +61,6 @@ public class TicketService {
         }
         return ticketResponseDtos;
     }
-
-
 
     public List<TicketResponseDto> ticketBooking(TicketEntryDto ticketEntryDto) throws RequestedSeatAreNotAvailable, UserDoesNotExist, ShowDoesNotExists{
         // check show present
@@ -84,7 +80,7 @@ public class TicketService {
 
         List<String> requestedSeats = ticketEntryDto.getRequestSeats();
         if (requestedSeats == null || requestedSeats.size() < 1) {
-            throw new RequestedSeatAreNotAvailable("No Seat Requested!"); // Only one seat per ticket as per model
+            throw new RequestedSeatAreNotAvailable("No Seat Requested!");
         }
         List<TicketResponseDto> tickets = new ArrayList<>();
         for(String seatno : requestedSeats){
@@ -124,9 +120,16 @@ public class TicketService {
             tickets.add(TicketTransformer.returnTicket(show, ticket));
         }
 
+        // --- CHANGE 2: Send the confirmation email ---
+        // This code will execute only after the tickets have been successfully saved to the database.
+        String userEmail = user.getEmail(); // Get the user's email from the User object.
+        emailService.sendTicketConfirmationEmail(userEmail, tickets);
+        // --- END OF CHANGES ---
+
         return tickets;
     }
 
+    // The helper methods below remain unchanged.
     private Boolean isSeatAvailable(List<ShowSeat> showSeatList, List<String> requestSeats) {
         for(ShowSeat showSeat : showSeatList) {
             String seatNo = showSeat.getSeatNo();
@@ -157,5 +160,4 @@ public class TicketService {
         }
         return sb.toString();
     }
-
 }

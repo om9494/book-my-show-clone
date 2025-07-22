@@ -54,6 +54,12 @@
 		    <artifactId>mysql-connector-j</artifactId>
 		    <scope>runtime</scope>
          </dependency>
+         <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-mail</artifactId>
+</dependency>
+         
+         
          
         <!-- REMOVED: Explicit slf4j-api and logback-classic dependencies.
                      These are provided transitively and managed by spring-boot-starter-parent
