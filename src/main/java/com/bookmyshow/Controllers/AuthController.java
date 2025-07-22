@@ -1,9 +1,7 @@
 package com.bookmyshow.Controllers;
 
 import com.bookmyshow.Enums.Role;
-
 import com.bookmyshow.Models.User;
-import com.bookmyshow.Services.JwtService;
 import com.bookmyshow.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,8 +11,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -24,72 +22,79 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private JwtService jwtService;
-
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody Map<String, String> request) {
-        String username = request.get("username");
-        String password = request.get("password");
-        String name = request.get("name");
-        String gender = request.get("gender");
-        String ageStr = request.get("age");
-        String phoneNumber = request.get("phoneNumber");
-        String email = request.get("email");
-        String roleStr = request.get("role");
+        try {
+            String username = request.get("username");
+            String password = request.get("password");
+            String name = request.get("name");
+            String gender = request.get("gender");
+            String ageStr = request.get("age");
+            String phoneNumber = request.get("phoneNumber");
+            String email = request.get("email");
+            String roleStr = request.get("role");
 
-        if (username == null || password == null || name == null || gender == null ||
-                ageStr == null || phoneNumber == null || email == null) {
-            return new ResponseEntity<>("All fields are required", HttpStatus.BAD_REQUEST);
+            if (username == null || password == null || name == null || gender == null ||
+                    ageStr == null || phoneNumber == null || email == null) {
+                return new ResponseEntity<>("All fields are required", HttpStatus.BAD_REQUEST);
+            }
+
+            Integer age = Integer.parseInt(ageStr);
+
+            Role role = Role.USER;
+            if (roleStr != null && roleStr.equalsIgnoreCase("ADMIN")) {
+                role = Role.ADMIN;
+            }
+
+            String result = userService.registerUser(username, password, name, gender, age,
+                    phoneNumber, email, Set.of(role));
+            return new ResponseEntity<>(result, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-
-        else{
-            System.out.println("Received registration request: " + request);
-        }
-
-        Integer age = Integer.parseInt(ageStr);
-
-        Role role = Role.USER;
-        System.out.println("RoleStr: " + roleStr);
-        if (roleStr != null && roleStr.equalsIgnoreCase("ADMIN")) {
-            role = Role.ADMIN;
-            System.out.println("Role set to ADMIN for user: " + username);
-        }
-
-        //log
-        System.out.println("User registration details: " + request);
-
-        String result = userService.registerUser(username, password, name, gender, age,
-                phoneNumber, email, Set.of(role));
-        return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String token = jwtService.generateToken(authentication);
+    public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> request) {
+        try {
+            String username = request.get("username");
+            String password = request.get("password");
 
-        Map<String, String> response = new HashMap<>();
-        response.put("token", token);
-        response.put("username", authentication.getName());
+            if (username == null || password == null) {
+                Map<String, String> error = new HashMap<>();
+                error.put("error", "Username and password are required");
+                return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+            }
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+            String token = userService.verifyUser(username, password);
+
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Login successful");
+            response.put("token", token);
+            response.put("username", username);
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @GetMapping("/profile")
     public ResponseEntity<User> getProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal() instanceof String) {
-            // Handle cases where the user is not authenticated
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String username = userDetails.getUsername();
-        User user = userService.findByUsername(username);
+        User user = userService.findByUsername(userDetails.getUsername());
         if (user == null) {
-            // This case can happen if the user is deleted after a token is issued.
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        // Map<String, Object> response = new HashMap<>();
+        // response.put("username", authentication.getName());
+        // response.put("roles", authentication.getAuthorities());
 
         return new ResponseEntity<>(user, HttpStatus.OK);
     }

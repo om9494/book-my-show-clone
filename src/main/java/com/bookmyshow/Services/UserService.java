@@ -4,6 +4,9 @@ import com.bookmyshow.Enums.Role;
 import com.bookmyshow.Models.User;
 import com.bookmyshow.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +20,12 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtService jwtService;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     public String registerUser(String username, String password, String name, String gender,
                                Integer age, String phoneNumber, String email, Set<Role> roles) {
@@ -38,6 +47,22 @@ public class UserService {
         userRepository.save(user);
 
         return "User registered successfully";
+    }
+
+    public String verifyUser(String username, String password) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, password)
+            );
+
+            if (authentication.isAuthenticated()) {
+                return jwtService.generateToken(username);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid credentials");
+        }
+
+        return null;
     }
 
     public User findByUsername(String username) {
