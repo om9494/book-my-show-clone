@@ -40,4 +40,6 @@ public class Show {
 	@ManyToOne
     @JoinColumn
 	private Theater theatre;
+	
+	
 }
