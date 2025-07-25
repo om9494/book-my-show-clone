@@ -47,6 +47,9 @@ public class User {
     @Column(name = "role")
     private Set<Role> roles;
 
+    @OneToOne(mappedBy = "user")
+    private ForgetPassword forgetPassword;
+
     public User() {}
 
     public User(String username, String password, String name, String gender, Integer age,

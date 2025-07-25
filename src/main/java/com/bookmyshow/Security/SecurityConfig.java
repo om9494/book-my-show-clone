@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints for login, registration, and browsing movies
-                        .requestMatchers("/signup/register", "/signup/login").permitAll()
+                        .requestMatchers("/signup/register", "/signup/login", "/forgetpassword/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow pre-flight requests
                         .requestMatchers("/movies/all", "/movies/id/**", "/movies/search").permitAll()
 
