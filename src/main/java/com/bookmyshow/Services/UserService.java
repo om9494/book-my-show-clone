@@ -27,6 +27,11 @@ public class UserService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    // ADD THIS LINE
+    @Autowired
+    private EmailService emailService;
+
+
     public String registerUser(String username, String password, String name, String gender,
                                Integer age, String phoneNumber, String email, Set<Role> roles) {
 
@@ -56,6 +61,14 @@ public class UserService {
             );
 
             if (authentication.isAuthenticated()) {
+                // Get the user details to retrieve their email
+                User user = userRepository.findByUsername(username);
+                if (user != null) {
+                    // ADD THIS LINE TO SEND EMAIL AFTER SUCCESSFUL LOGIN
+                    emailService.sendLoginNotificationEmail(user.getEmail(), user.getUsername());
+                } else {
+                    System.err.println("User not found for username: " + username + ". Cannot send login notification email.");
+                }
                 return jwtService.generateToken(username);
             }
         } catch (Exception e) {
