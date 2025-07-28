@@ -8,14 +8,14 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.3</version> <!-- Ensure this version is correct for your project -->
+        <version>3.3.1</version> <!-- Corrected to a valid, recent stable version -->
         <relativePath/>
     </parent>
 
     <groupId>com.bookmyshow</groupId>
     <artifactId>book-my-show</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <properties>
         <java.version>17</java.version>
     </properties>
@@ -117,7 +117,7 @@
         <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
-            <version>3.1.1</version>
+            <!-- Version managed by Spring Boot parent -->
         </dependency>
 
         <!-- Hibernate Validator (the implementation) -->
@@ -126,16 +126,6 @@
             <artifactId>hibernate-validator</artifactId>
             <!-- Version is managed by Spring Boot parent -->
         </dependency>
-        
-        <!-- Note: jakarta.validation-api is listed twice in your original POM.
-                     One declaration with a version, and one without.
-                     Keeping the one with the version 3.1.1.
-                     The one without a version would rely on Spring Boot's managed version.
-                     It's generally better to let Spring Boot manage it unless you have a specific reason to override.
-                     If you want to rely on Spring Boot's managed version for validation-api,
-                     you can remove the version tag from the jakarta.validation-api dependency.
-                     For now, I'll keep the explicit version you provided.
-        -->
 
     </dependencies>
 
