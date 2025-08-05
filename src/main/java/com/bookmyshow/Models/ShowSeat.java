@@ -1,5 +1,7 @@
 package com.bookmyshow.Models;
 
+import java.time.LocalDateTime;
+
 import com.bookmyshow.Enums.SeatType;
 
 import jakarta.persistence.Entity;
@@ -33,6 +35,9 @@ public class ShowSeat {
 	private Integer price;
 	private Boolean isAvailable;
 	private Boolean isFoodContains;
+	// Add this new field
+    private String lockedByUserId; // Stores the user ID who locked the seat
+    private LocalDateTime lockedAt; // Stores the timestamp when the seat was locked
 	
 	@ManyToOne
     @JoinColumn(name = "show_id") 
