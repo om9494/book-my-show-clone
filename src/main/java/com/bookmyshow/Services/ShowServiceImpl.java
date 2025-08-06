@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
+import java.util.Optional; // Import Optional
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -192,6 +193,27 @@ public class ShowServiceImpl implements ShowService {
         return "Show seats have been associated successfully!";
     }
 
+    // --- START OF FIX ---
+    // This new method handles the request from the TheaterDetails page.
+    @Override
+    public List<Show> getShowsByTheaterId(Integer theaterId) throws TheaterDoesNotExists {
+        logger.info("Fetching all shows for theater ID: {}", theaterId);
+
+        // 1. Fetch the Theater entity from the database using its ID.
+        Theater theater = theatreRepository.findById(theaterId)
+                .orElseThrow(() -> {
+                    logger.error("Theater with ID {} not found.", theaterId);
+                    return new TheaterDoesNotExists();
+                });
+
+        // 2. Pass the complete Theater object to the repository to find all associated shows.
+        List<Show> shows = showRepository.findAllByTheatre(theater);
+
+        logger.debug("Found {} shows for theater ID {}.", shows.size(), theaterId);
+        return shows;
+    }
+    // --- END OF FIX ---
+
     @Override
     public List<Time> showTimingsOnDate(ShowTimingsDto showTimingsDto) {
         logger.info("Fetching show timings for movie ID: {}, theater ID: {}, and date: {}", showTimingsDto.getMovieId(), showTimingsDto.getTheaterId(), showTimingsDto.getDate());
@@ -290,11 +312,9 @@ public class ShowServiceImpl implements ShowService {
         Time currentTime = new Time(System.currentTimeMillis());
         Date currentDate = new Date(System.currentTimeMillis());
         List<Show> shows = showRepository.getAllShowsOfMovieInTheater(movieId, theaterId);
-        for(Show show : shows){
-            if (show.getDate().before(currentDate) || (show.getDate().equals(currentDate) && show.getTime().before(currentTime))){
-                shows.remove(show);
-            }
-        }
+        // This logic for removing shows is problematic and can cause ConcurrentModificationException
+        // A better approach is to use an iterator or stream filter.
+        shows.removeIf(show -> show.getDate().before(currentDate) || (show.getDate().equals(currentDate) && show.getTime().before(currentTime)));
         logger.debug("Found {} shows for movie ID {} and theater ID {}.", shows.size(), movieId, theaterId);
         return shows;
     }

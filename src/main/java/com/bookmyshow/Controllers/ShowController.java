@@ -5,11 +5,13 @@ import com.bookmyshow.Dtos.RequestDtos.ShowSeatEntryDto;
 import com.bookmyshow.Dtos.RequestDtos.ShowTimingsAllTheaterDto; // Make sure this DTO exists if used
 import com.bookmyshow.Dtos.RequestDtos.ShowTimingsDto;
 import com.bookmyshow.Exceptions.MovieDoesNotExists;
+import com.bookmyshow.Exceptions.TheaterDoesNotExists;
 import com.bookmyshow.Models.SeatPrice;
 import com.bookmyshow.Models.Show;
 import com.bookmyshow.Services.ShowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -86,6 +88,17 @@ public class ShowController {
             System.err.println("Error associating show seats: " + e.getMessage());
             e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to associate show seats: " + e.getMessage(), e);
+        }
+    }
+    
+    @GetMapping("/theater/{theaterId}")
+    public ResponseEntity<List<Show>> getShowsByTheaterId(@PathVariable Integer theaterId) {
+        try {
+            List<Show> shows = showService.getShowsByTheaterId(theaterId);
+            return new ResponseEntity<>(shows, HttpStatus.OK);
+        } catch (TheaterDoesNotExists e) {
+            // If the theater ID is invalid, return a 404 Not Found error.
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 

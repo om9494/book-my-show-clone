@@ -33,7 +33,7 @@ public class TicketController {
     }
 
     @PostMapping("/book")
-    public ResponseEntity<List<TicketResponseDto>> ticketBooking(@RequestBody TicketEntryDto ticketEntryDto) {
+    public ResponseEntity<List<TicketResponseDto>> ticketBooking(@RequestBody TicketEntryDto ticketEntryDto) throws Exception {
         // Let exceptions bubble up to GlobalExceptionHandler
         List<TicketResponseDto> result = ticketService.ticketBooking(ticketEntryDto);
         return new ResponseEntity<>(result, HttpStatus.CREATED);
