@@ -36,7 +36,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.and()) // Enables CORS based on your CorsConfig.java
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints for login, registration, and browsing movies
+                        // Public endpoints for login, registration, and Browse movies
                         .requestMatchers("/signup/register", "/signup/login", "/forgetpassword/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow pre-flight requests
                         .requestMatchers("/movies/all", "/movies/id/**", "/movies/search").permitAll()
@@ -54,12 +54,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/reviews/movie/**").permitAll() // Anyone can view reviews
                         .requestMatchers("/reviews/**").authenticated()
                         .requestMatchers("/seats/lockSeat", "/seats/unlockSeat").hasAnyRole("USER", "ADMIN")
-
-
-                        // --- NEW RULE FOR PAYMENT ---
-                        // This secures the Razorpay payment endpoints.
-                        // Only logged-in users (USER or ADMIN) can create or verify a payment.
                         .requestMatchers("/api/payment/**").hasAnyRole("USER", "ADMIN")
+
+                        // --- NEW RULE FOR VIEWING FOOD (USER & ADMIN) ---
+                        .requestMatchers("/show-food/show/**").hasAnyRole("USER", "ADMIN")
 
                         // Admin-only endpoints
                         .requestMatchers("/movies/add", "/movies/*/").hasRole("ADMIN")
@@ -67,6 +65,9 @@ public class SecurityConfig {
                         .requestMatchers("/shows/associateShowSeats").hasRole("ADMIN")
                         .requestMatchers("/theaters/addTheater", "/theaters/updateTheater/**", "/theaters/deleteTheater/**").hasRole("ADMIN")
                         .requestMatchers("/theater-seats/addTheaterSeat", "/theater-seats/updateTheaterSeat/**", "/theater-seats/deleteTheaterSeat/**").hasRole("ADMIN")
+                        
+                        // --- NEW RULES FOR MANAGING FOOD (ADMIN ONLY) ---
+                        .requestMatchers("/show-food/add", "/show-food/update/**", "/show-food/delete/**").hasRole("ADMIN")
                         
                         // Any other request must be authenticated
                         .anyRequest().authenticated()
@@ -89,12 +90,4 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-
-    // @Bean
-    // public DaoAuthenticationProvider authenticationProvider() {
-    //     DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-    //     authProvider.setUserDetailsService(customUserDetailsService);
-    //     authProvider.setPasswordEncoder(passwordConfig.passwordEncoder());
-    //     return authProvider;
-    // }
 }

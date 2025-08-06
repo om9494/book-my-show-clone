@@ -19,6 +19,8 @@ public interface ShowService {
 	public String addShow(ShowEntryDto showEntryDto) throws MovieDoesNotExists, TheaterDoesNotExists;
 	public String updateShow(int id, ShowEntryDto showEntryDto) throws ShowDoesNotExists, MovieDoesNotExists, TheaterDoesNotExists;
 	public String deleteShow(int id) throws ShowDoesNotExists;
+	public List<Show> getShowsByTheaterId(Integer theaterId) throws TheaterDoesNotExists;
+
 
 	public List<Show> getShowByMovieAndTheater(int movieId, int theaterId)
 			throws MovieDoesNotExists, TheaterDoesNotExists;

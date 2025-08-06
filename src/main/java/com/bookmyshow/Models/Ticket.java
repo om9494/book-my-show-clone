@@ -1,6 +1,7 @@
 package com.bookmyshow.Models;
 
 import java.sql.Date;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -9,6 +10,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -43,5 +46,14 @@ public class Ticket {
     @OneToOne
     @JoinColumn
     private ShowSeat showSeat; // Booked Seat
+    
+    @ManyToMany
+    @JoinTable(
+        name = "ticket_food",
+        joinColumns = @JoinColumn(name = "ticket_id"),
+        inverseJoinColumns = @JoinColumn(name = "food_id")
+    )
+    private List<ShowFood> purchasedFoods;
+
 
 }

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.bookmyshow.Models.Show;
+import com.bookmyshow.Models.Theater;
 
 @Repository
 public interface ShowRepository extends JpaRepository<Show, Integer> {
@@ -32,6 +33,9 @@ public interface ShowRepository extends JpaRepository<Show, Integer> {
     //All shows 
     @Query(value = "SELECT * FROM shows WHERE date >= CURDATE()", nativeQuery = true)
     public List<Show> findAll();
+    
+    List<Show> findAllByTheatre(Theater theater);
+
 
 
 }
